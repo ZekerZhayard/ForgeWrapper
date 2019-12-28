@@ -1,0 +1,107 @@
+{
+  "formatVersion": 1,
+  "libraries": [
+    {
+      "name": "com.github.ZekerZhayard:ForgeWrapper:-SNAPSHOT",
+      "url": "https://jitpack.io/"
+    },
+    {
+      "name": "net.minecraftforge:forge:1.14.4-28.1.109:launcher",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "org.ow2.asm:asm:6.2",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "org.ow2.asm:asm-commons:6.2",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "org.ow2.asm:asm-tree:6.2",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "cpw.mods:modlauncher:4.1.0",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "cpw.mods:grossjava9hacks:1.1.0",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "net.minecraftforge:accesstransformers:1.0.1-milestone.0.1+94458e7:shadowed",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "net.minecraftforge:eventbus:1.0.0:service",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "net.minecraftforge:forgespi:1.5.0",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "net.minecraftforge:coremods:1.0.0",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "net.minecraftforge:unsafe:0.2.0",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "com.electronwill.night-config:core:3.6.0",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "com.electronwill.night-config:toml:3.6.0",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "org.jline:jline:3.12.1",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "org.apache.maven:maven-artifact:3.6.0",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "net.jodah:typetools:0.6.0",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "java3d:vecmath:1.5.2"
+    },
+    {
+      "name": "org.apache.logging.log4j:log4j-api:2.11.2",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "org.apache.logging.log4j:log4j-core:2.11.2",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "net.minecrell:terminalconsoleappender:1.2.0",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "net.sf.jopt-simple:jopt-simple:5.0.4",
+      "url": "https://files.minecraftforge.net/maven/"
+    },
+    {
+      "name": "cpw.mods.forge:cursepacklocator:1.2.0",
+      "url": "https://files.minecraftforge.net/maven/"
+    }
+  ],
+  "mainClass": "io.github.zekerzhayard.forgewrapper.Main",
+  "name": "MinecraftForge",
+  "requires": [
+    {
+      "equals": "1.14.4",
+      "uid": "net.minecraft"
+    }
+  ],
+  "type": "release",
+  "uid": "net.minecraftforge",
+  "version": "1.14.4-28.1.109"
+}
