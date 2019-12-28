@@ -35,7 +35,7 @@ public class Utils {
     public static File getLibrariesDir() throws URISyntaxException {
         File wrapper = new File(Utils.class.getProtectionDomain().getCodeSource().getLocation().toURI());
         // see https://github.com/MinecraftForge/MinecraftForge/blob/863ab2ca184cf2e2dfa134d07bfc20d6a9a6a4e8/src/main/java/net/minecraftforge/fml/relauncher/libraries/LibraryManager.java#L151
-        //                          <version>       ForgeWrapper    ZekerZhayard    github          com             libraries
+        //             /<version>      /ForgeWrapper   /ZekerZhayard   /github         /com            /libraries
         return wrapper.getParentFile().getParentFile().getParentFile().getParentFile().getParentFile().getParentFile();
     }
 }
