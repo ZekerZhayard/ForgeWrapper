@@ -1,7 +1,6 @@
 package io.github.zekerzhayard.forgewrapper.installer;
 
 import java.io.File;
-import java.net.URISyntaxException;
 import java.util.function.Predicate;
 
 import io.github.zekerzhayard.forgewrapper.Utils;
@@ -16,20 +15,19 @@ public class ClientInstall4MultiMC extends ClientInstall {
     }
 
     @Override
-    public boolean run(File target, Predicate<String> optionals) throws ActionCanceledException {
-        try {
-            File librariesDir = Utils.getLibrariesDir();
-            File clientTarget = new File(String.format("%s/com/mojang/minecraft/%s/minecraft-%s-client.jar", librariesDir.getAbsolutePath(), this.profile.getMinecraft(), this.profile.getMinecraft()));
+    public boolean run(File target, Predicate<String> optionals) {
+        File librariesDir = Utils.getLibrariesDir();
+        File clientTarget = new File(String.format("%s/com/mojang/minecraft/%s/minecraft-%s-client.jar", librariesDir.getAbsolutePath(), this.profile.getMinecraft(), this.profile.getMinecraft()));
 
-            if (!this.downloadLibraries(librariesDir, optionals)) {
-                return false;
-            }
-            if (!this.processors.process(librariesDir, clientTarget)) {
-                return false;
-            }
-        } catch (URISyntaxException e) {
+        boolean downloadLibraries = true; // Force true when without an internet connection.
+        try {
+            downloadLibraries = this.downloadLibraries(librariesDir, optionals);
+        } catch (ActionCanceledException e) {
+            e.printStackTrace();
+        }
+        if (!downloadLibraries) {
             return false;
         }
-        return true;
+        return this.processors.process(librariesDir, clientTarget);
     }
 }

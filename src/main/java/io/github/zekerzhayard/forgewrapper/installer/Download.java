@@ -16,11 +16,13 @@ public class Download {
         localFile.getParentFile().mkdirs();
         if (localFile.isFile()) {
             try {
+                System.out.println("Checking Fingerprints of installer...");
                 Files.copy(new URL(url + ".md5").openConnection().getInputStream(), Paths.get(location + ".md5"), StandardCopyOption.REPLACE_EXISTING);
                 Files.copy(new URL(url + ".sha1").openConnection().getInputStream(), Paths.get(location + ".sha1"), StandardCopyOption.REPLACE_EXISTING);
                 String md5 = new String(Files.readAllBytes(Paths.get(location + ".md5")));
                 String sha1 = new String(Files.readAllBytes(Paths.get(location + ".sha1")));
                 if (!checkMD5(location, md5) || !checkSHA1(location, sha1)) {
+                    System.out.println("Fingerprints do not match!");
                     localFile.delete();
                 }
             } catch (IOException e) {
@@ -31,6 +33,7 @@ public class Download {
             if (localFile.isDirectory()) {
                 throw new RuntimeException(location + " must be a file!");
             }
+            System.out.println("Downloading forge installer...");
             Files.copy(new URL(url).openConnection().getInputStream(), Paths.get(location), StandardCopyOption.REPLACE_EXISTING);
             download(url, location);
         }

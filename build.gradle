@@ -4,7 +4,7 @@ apply plugin: "idea"
 
 sourceCompatibility = targetCompatibility = 1.8
 
-version = "1.0.0"
+version = "1.1.0"
 group = "io.github.zekerzhayard"
 archivesBaseName = rootProject.name
 
@@ -19,12 +19,23 @@ repositories {
 
 dependencies {
     compile "commons-codec:commons-codec:1.10"
-    compile "cpw.mods:modlauncher:5.0.0-milestone.4"
-    compile "net.minecraftforge:forge:1.15.1-30.0.16:installer"
+    compile "cpw.mods:modlauncher:4.1.0"
+    compile "net.minecraftforge:forge:1.14.4-28.2.0:installer"
 }
 
 jar {
     manifest.attributes(
-            "Main-Class": "io.github.zekerzhayard.forgewrapper.Main"
+            "Main-Class": "io.github.zekerzhayard.forgewrapper.converter.Main"
     )
+}
+
+processResources {
+    inputs.property "version", project.version
+    from(sourceSets.main.resources.srcDirs) {
+        include "patches/net.minecraftforge.json"
+        expand "version": project.version
+    }
+    from(sourceSets.main.resources.srcDirs) {
+        exclude "patches/net.minecraftforge.json"
+    }
 }

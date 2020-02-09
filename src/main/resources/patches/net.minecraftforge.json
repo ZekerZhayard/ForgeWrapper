@@ -1,0 +1,21 @@
+{
+  "formatVersion": 1,
+  "mainClass": "io.github.zekerzhayard.forgewrapper.Main",
+  "name": "Forge",
+  "requires": [
+    {
+      "equals": "{VERSION}",
+      "uid": "net.minecraft"
+    }
+  ],
+  "type": "release",
+  "uid": "net.minecraftforge",
+  "version": "{FORGE_VERSION}",
+  "libraries": [
+    {
+      "name": "io.github.zekerzhayard:ForgeWrapper:${version}",
+      "MMC-hint": "local",
+      "MMC-filename": "ForgeWrapper-${version}.jar"
+    }
+  ]
+}

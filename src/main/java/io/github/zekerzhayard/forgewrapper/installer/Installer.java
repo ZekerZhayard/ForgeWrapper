@@ -1,10 +1,5 @@
 package io.github.zekerzhayard.forgewrapper.installer;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.regex.Pattern;
-
-import net.minecraftforge.installer.actions.ActionCanceledException;
 import net.minecraftforge.installer.actions.ProgressCallback;
 import net.minecraftforge.installer.json.Install;
 import net.minecraftforge.installer.json.Util;
@@ -12,7 +7,7 @@ import net.minecraftforge.installer.json.Util;
 public class Installer {
     private static Install install;
 
-    public static boolean install() throws ActionCanceledException {
+    public static boolean install() {
         ProgressCallback monitor = ProgressCallback.withOutputs(System.out);
         install = Util.loadInstallProfile();
         if (System.getProperty("java.net.preferIPv4Stack") == null) {
@@ -36,35 +31,5 @@ public class Installer {
 
     public static String getMcpVersion() {
         return install.getData(true).get("MCP_VERSION").replace("'", "");
-    }
-
-    static void hookStdOut(ProgressCallback monitor) {
-        final Pattern endingWhitespace = Pattern.compile("\\r?\\n$");
-        final OutputStream monitorStream = new OutputStream() {
-
-            @Override
-            public void write(byte[] buf, int off, int len) {
-                byte[] toWrite = new byte[len];
-                System.arraycopy(buf, off, toWrite, 0, len);
-                write(toWrite);
-            }
-
-            @Override
-            public void write(byte[] b) {
-                String toWrite = new String(b);
-                toWrite = endingWhitespace.matcher(toWrite).replaceAll("");
-                if (!toWrite.isEmpty()) {
-                    monitor.message(toWrite);
-                }
-            }
-
-            @Override
-            public void write(int b) {
-                write(new byte[] {(byte) b});
-            }
-        };
-
-        System.setOut(new PrintStream(monitorStream));
-        System.setErr(new PrintStream(monitorStream));
     }
 }

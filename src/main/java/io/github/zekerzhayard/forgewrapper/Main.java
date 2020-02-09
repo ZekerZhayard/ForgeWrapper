@@ -16,7 +16,7 @@ import io.github.zekerzhayard.forgewrapper.installer.Download;
 public class Main {
     public static void main(String[] args) throws Exception {
         URL[] urls = Utils.getURLs(new ArrayList<>());
-        Pattern pattern = Pattern.compile("forge\\-(?<mcVersion>[0-9\\.]+)\\-(?<forgeVersion>[0-9\\.]+)\\-launcher\\.jar");
+        Pattern pattern = Pattern.compile("forge-(?<mcVersion>[0-9.]+)-(?<forgeVersion>[0-9.]+)\\.jar");
         String version = "";
         for (URL url : urls) {
             Matcher matcher = pattern.matcher(url.getFile());
@@ -30,6 +30,7 @@ public class Main {
 
         URLClassLoader ucl = URLClassLoader.newInstance(new URL[] {
             Main.class.getProtectionDomain().getCodeSource().getLocation(),
+            Launcher.class.getProtectionDomain().getCodeSource().getLocation(),
             new File(String.format("./.forgewrapper/forge-%s-installer.jar", version)).toURI().toURL()
         }, null);
 
