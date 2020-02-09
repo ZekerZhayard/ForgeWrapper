@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
@@ -24,10 +25,7 @@ import com.google.gson.JsonParser;
 public class Converter {
     public static void convert(Path installerPath, Path targetDir) throws Exception {
         JsonObject installer = getInstallerJson(installerPath);
-
-        ArrayList<String> arguments = new ArrayList<>();
-
-        getElement(installer.getAsJsonObject("arguments"), "game").getAsJsonArray().iterator().forEachRemaining(je -> arguments.add(je.getAsString()));
+        List<String> arguments = getAdditionalArgs(installer);
         String mcVersion = arguments.get(arguments.indexOf("--fml.mcVersion") + 1);
         String forgeVersion = arguments.get(arguments.indexOf("--fml.forgeVersion") + 1);
         String forgeFullVersion = "forge-" + mcVersion + "-" + forgeVersion;
@@ -60,7 +58,18 @@ public class Converter {
         Files.copy(installerPath, forgeWrapperPath.resolve(forgeFullVersion + "-installer.jar"), StandardCopyOption.REPLACE_EXISTING);
     }
 
-    private static JsonObject getInstallerJson(Path installerPath) {
+    public static List<String> getAdditionalArgs(Path installerPath) {
+        JsonObject installer = getInstallerJson(installerPath);
+        return getAdditionalArgs(installer);
+    }
+
+    public static List<String> getAdditionalArgs(JsonObject installer) {
+        List<String> args = new ArrayList<>();
+        getElement(installer.getAsJsonObject("arguments"), "game").getAsJsonArray().iterator().forEachRemaining(je -> args.add(je.getAsString()));
+        return args;
+    }
+
+    public static JsonObject getInstallerJson(Path installerPath) {
         try {
             ZipFile zf = new ZipFile(installerPath.toFile());
             ZipEntry versionFile = zf.getEntry("version.json");

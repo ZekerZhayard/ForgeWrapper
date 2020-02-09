@@ -5,11 +5,9 @@ import net.minecraftforge.installer.json.Install;
 import net.minecraftforge.installer.json.Util;
 
 public class Installer {
-    private static Install install;
-
     public static boolean install() {
         ProgressCallback monitor = ProgressCallback.withOutputs(System.out);
-        install = Util.loadInstallProfile();
+        Install install = Util.loadInstallProfile();
         if (System.getProperty("java.net.preferIPv4Stack") == null) {
             System.setProperty("java.net.preferIPv4Stack", "true");
         }
@@ -19,17 +17,5 @@ public class Installer {
         monitor.message(String.format("JVM info: %s - %s - %s", vendor, javaVersion, jvmVersion));
         monitor.message("java.net.preferIPv4Stack=" + System.getProperty("java.net.preferIPv4Stack"));
         return new ClientInstall4MultiMC(install, monitor).run(null, input -> true);
-    }
-
-    public static String getForgeVersion() {
-        return install.getVersion().substring(install.getVersion().lastIndexOf("-") + 1);
-    }
-
-    public static String getMcVersion() {
-        return install.getMinecraft();
-    }
-
-    public static String getMcpVersion() {
-        return install.getData(true).get("MCP_VERSION").replace("'", "");
     }
 }
