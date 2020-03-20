@@ -1,6 +1,6 @@
 # ForgeWrapper
 
-Allow MultiMC to launch Minecraft 1.13+ with Forge.
+Allow [MultiMC](https://github.com/MultiMC/MultiMC5) to launch Minecraft 1.13+ with Forge.
 
 ## How to use
 
@@ -26,5 +26,5 @@ Allow MultiMC to launch Minecraft 1.13+ with Forge.
    *Notice: If you don't specify a MultiMC instance path, ForgeWrapper will create the instance folder in current working space.*
 
 4. If the instance folder which just created is not in `MultiMC/instances` folder, you just need to move to the `MultiMC/instances` folder.
-5. Run MultiMC, and you will see a new instance named `<modpackName>-<modpackVersion>`.
+5. Run MultiMC, and you will see a new instance named `<modpackName>-<modpackVersion>`.   
 *Notice: CurseForge modpack will be installed on first launch by [cursepacklocator](https://github.com/cpw/cursepacklocator), it will take a few minutes.*
