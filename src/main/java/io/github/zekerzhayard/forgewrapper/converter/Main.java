@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 
-import io.github.zekerzhayard.forgewrapper.installer.Download;
+import io.github.zekerzhayard.forgewrapper.Utils;
 
 public class Main {
     public static void main(String[] args) {
@@ -18,7 +18,7 @@ public class Main {
                 installer = Paths.get(argsMap.get("--installer"));
             } else {
                 installer = Paths.get(System.getProperty("java.io.tmpdir", "."), "gson-2.8.6.jar");
-                Download.download("https://repo1.maven.org/maven2/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar", installer.toString());
+                Utils.download("https://repo1.maven.org/maven2/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar", installer.toString());
             }
             if (argsMap.containsKey("--instance")) {
                 instance = Paths.get(argsMap.get("--instance"));

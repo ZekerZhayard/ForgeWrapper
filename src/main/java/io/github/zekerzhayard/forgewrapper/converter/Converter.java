@@ -21,7 +21,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import io.github.zekerzhayard.forgewrapper.installer.Download;
+import io.github.zekerzhayard.forgewrapper.Utils;
 
 public class Converter {
     public static void convert(Path installerPath, Path targetDir, String cursepack) throws Exception {
@@ -58,27 +58,23 @@ public class Converter {
         Files.createDirectories(patchesPath);
         Files.copy(new ByteArrayInputStream(patches.toString().getBytes(StandardCharsets.UTF_8)), patchesPath.resolve("net.minecraftforge.json"), StandardCopyOption.REPLACE_EXISTING);
 
-        // Copy forge installer to <instance>/.minecraft/.forgewrapper folder.
-        Path forgeWrapperPath = instancePath.resolve(".minecraft").resolve(".forgewrapper");
-        Files.createDirectories(forgeWrapperPath);
-        Files.copy(installerPath, forgeWrapperPath.resolve(forgeFullVersion + "-installer.jar"), StandardCopyOption.REPLACE_EXISTING);
-
         // Extract all curse pack entries to <instance>/.minecraft folder.
+        Path minecraftPath = instancePath.resolve(".minecraft");
         if (cursepack != null) {
             ZipFile zip = new ZipFile(cursepack);
             Enumeration<? extends ZipEntry> entries = zip.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
-                Path targetFolder = forgeWrapperPath.getParent().resolve(entry.getName());
+                Path targetFolder = minecraftPath.resolve(entry.getName());
                 Files.createDirectories(targetFolder.getParent());
                 Files.copy(zip.getInputStream(entry), targetFolder, StandardCopyOption.REPLACE_EXISTING);
             }
         }
-    }
 
-    public static List<String> getAdditionalArgs(Path installerPath) {
-        JsonObject installer = getJsonFromZip(installerPath, "version.json");
-        return getAdditionalArgs(installer);
+        // Copy forge installer to <instance>/.minecraft/.forgewrapper folder.
+        Path forgeWrapperPath = minecraftPath.resolve(".forgewrapper");
+        Files.createDirectories(forgeWrapperPath);
+        Files.copy(installerPath, forgeWrapperPath.resolve(forgeFullVersion + "-installer.jar"), StandardCopyOption.REPLACE_EXISTING);
     }
 
     public static List<String> getAdditionalArgs(JsonObject installer) {
@@ -119,7 +115,7 @@ public class Converter {
         String packName = getElement(manifest, "name").getAsString();
         String packVersion = getElement(manifest, "version").getAsString();
         Path installer = Paths.get(System.getProperty("java.io.tmpdir", "."), String.format("%s-%s-installer.jar", packName, packVersion));
-        Download.download(String.format("https://files.minecraftforge.net/maven/net/minecraftforge/forge/%s-%s/forge-%s-%s-installer.jar", mcVersion, forgeVersion, mcVersion, forgeVersion), installer.toString());
+        Utils.download(String.format("https://files.minecraftforge.net/maven/net/minecraftforge/forge/%s-%s/forge-%s-%s-installer.jar", mcVersion, forgeVersion, mcVersion, forgeVersion), installer.toString());
         return installer;
     }
 
@@ -145,6 +141,9 @@ public class Converter {
     private static JsonObject convertPatchesJson(JsonObject installer, String mcVersion, String forgeVersion, StringBuilder wrapperVersion, String cursepack) {
         JsonObject patches = new JsonParser().parse(new InputStreamReader(Converter.class.getResourceAsStream("/patches/net.minecraftforge.json"))).getAsJsonObject();
         JsonArray libraries = getElement(patches, "libraries").getAsJsonArray();
+
+        String minecraftArguments = String.join(" ", getElement(patches, "minecraftArguments").getAsString(), "--username ${auth_player_name} --version ${version_name} --gameDir ${game_directory} --assetsDir ${assets_root} --assetIndex ${assets_index_name} --uuid ${auth_uuid} --accessToken ${auth_access_token} --userType ${user_type} --versionType ${version_type}", String.join(" ", getAdditionalArgs(installer))).trim();
+        patches.addProperty("minecraftArguments", minecraftArguments);
 
         for (JsonElement lib : libraries) {
             String name = getElement(lib.getAsJsonObject(), "name").getAsString();

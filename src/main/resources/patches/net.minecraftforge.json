@@ -1,6 +1,7 @@
 {
   "formatVersion": 1,
-  "mainClass": "io.github.zekerzhayard.forgewrapper.Main",
+  "mainClass": "why.does.multimc.target.Me",
+  "minecraftArguments": "",
   "name": "Forge",
   "requires": [
     {
