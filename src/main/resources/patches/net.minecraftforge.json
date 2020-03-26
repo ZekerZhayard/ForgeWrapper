@@ -1,6 +1,6 @@
 {
   "formatVersion": 1,
-  "mainClass": "why.does.multimc.target.Me",
+  "mainClass": "io.github.zekerzhayard.forgewrapper.installer.Main",
   "minecraftArguments": "",
   "name": "Forge",
   "requires": [
@@ -14,7 +14,7 @@
   "version": "{FORGE_VERSION}",
   "libraries": [
     {
-      "name": "io.github.zekerzhayard:ForgeWrapper:${version}",
+      "name": "io.github.zekerzhayard:Forge-Wrapper:${version}",
       "MMC-hint": "local",
       "MMC-filename": "ForgeWrapper-${version}.jar"
     }
