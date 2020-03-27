@@ -5,16 +5,14 @@ apply plugin: "idea"
 
 sourceCompatibility = targetCompatibility = 1.8
 
-version = "1.3.1"
+version = "1.4.0"
 group = "io.github.zekerzhayard"
 archivesBaseName = rootProject.name
 
 repositories {
-    mavenCentral()
-    jcenter()
     maven {
         name = "forge"
-        url = "https://files.minecraftforge.net/maven"
+        url = "https://files.minecraftforge.net/maven/"
     }
 }
 

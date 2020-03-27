@@ -12,9 +12,15 @@
   "type": "release",
   "uid": "net.minecraftforge",
   "version": "{FORGE_VERSION}",
+  "mavenFiles": [
+    {
+      "name": "net.minecraftforge:forge:{VERSION}-{FORGE_VERSION}:installer",
+      "url": "https://files.minecraftforge.net/maven/"
+    }
+  ],
   "libraries": [
     {
-      "name": "io.github.zekerzhayard:Forge-Wrapper:${version}",
+      "name": "io.github.zekerzhayard:ForgeWrapper:${version}",
       "MMC-hint": "local",
       "MMC-filename": "ForgeWrapper-${version}.jar"
     }

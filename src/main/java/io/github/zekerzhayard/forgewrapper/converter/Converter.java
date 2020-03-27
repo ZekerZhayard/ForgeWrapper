@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,12 +25,13 @@ import com.google.gson.JsonParser;
 import io.github.zekerzhayard.forgewrapper.Utils;
 
 public class Converter {
-    public static void convert(Path installerPath, Path targetDir, String cursepack) throws Exception {
+    public static void convert(Path installerPath, Path targetDir, Path multimcDir, String cursepack) throws Exception {
         if (cursepack != null) {
             installerPath = getForgeInstallerFromCursePack(cursepack);
         }
 
         JsonObject installer = getJsonFromZip(installerPath, "version.json");
+        JsonObject installProfile = getJsonFromZip(installerPath, "install_profile.json");
         List<String> arguments = getAdditionalArgs(installer);
         String mcVersion = arguments.get(arguments.indexOf("--fml.mcVersion") + 1);
         String forgeVersion = arguments.get(arguments.indexOf("--fml.forgeVersion") + 1);
@@ -38,7 +40,7 @@ public class Converter {
         StringBuilder wrapperVersion = new StringBuilder();
 
         JsonObject pack = convertPackJson(mcVersion);
-        JsonObject patches = convertPatchesJson(installer, mcVersion, forgeVersion, wrapperVersion, cursepack);
+        JsonObject patches = convertPatchesJson(installer, installProfile, mcVersion, forgeVersion, wrapperVersion, cursepack);
 
         Files.createDirectories(targetDir);
 
@@ -71,10 +73,12 @@ public class Converter {
             }
         }
 
-        // Copy forge installer to <instance>/.minecraft/.forgewrapper folder.
-        Path forgeWrapperPath = minecraftPath.resolve(".forgewrapper");
-        Files.createDirectories(forgeWrapperPath);
-        Files.copy(installerPath, forgeWrapperPath.resolve(forgeFullVersion + "-installer.jar"), StandardCopyOption.REPLACE_EXISTING);
+        // Copy forge installer to MultiMC/libraries/net/minecraftforge/forge/<mcVersion>-<forgeVersion> folder.
+        if (multimcDir != null) {
+            Path targetInstallerPath = multimcDir.resolve("net").resolve("minecraftforge").resolve("forge").resolve(forgeVersion);
+            Files.createDirectories(targetInstallerPath);
+            Files.copy(installerPath, targetInstallerPath.resolve(forgeFullVersion + "-installer.jar"), StandardCopyOption.REPLACE_EXISTING);
+        }
     }
 
     public static List<String> getAdditionalArgs(JsonObject installer) {
@@ -138,13 +142,18 @@ public class Converter {
     //   - Add libraries
     //   - Add forge-launcher url
     //   - Replace Minecraft & Forge versions
-    private static JsonObject convertPatchesJson(JsonObject installer, String mcVersion, String forgeVersion, StringBuilder wrapperVersion, String cursepack) {
+    private static JsonObject convertPatchesJson(JsonObject installer, JsonObject installProfile, String mcVersion, String forgeVersion, StringBuilder wrapperVersion, String cursepack) {
         JsonObject patches = new JsonParser().parse(new InputStreamReader(Converter.class.getResourceAsStream("/patches/net.minecraftforge.json"))).getAsJsonObject();
+        JsonArray mavenFiles = getElement(patches, "mavenFiles").getAsJsonArray();
         JsonArray libraries = getElement(patches, "libraries").getAsJsonArray();
 
         String minecraftArguments = String.join(" ", getElement(patches, "minecraftArguments").getAsString(), "--username ${auth_player_name} --version ${version_name} --gameDir ${game_directory} --assetsDir ${assets_root} --assetIndex ${assets_index_name} --uuid ${auth_uuid} --accessToken ${auth_access_token} --userType ${user_type} --versionType ${version_type}", String.join(" ", getAdditionalArgs(installer))).trim();
         patches.addProperty("minecraftArguments", minecraftArguments);
 
+        for (JsonElement mavenFile : mavenFiles) {
+            String name = getElement(mavenFile.getAsJsonObject(), "name").getAsString();
+            mavenFile.getAsJsonObject().addProperty("name", name.replace("{VERSION}", mcVersion).replace("{FORGE_VERSION}", forgeVersion));
+        }
         for (JsonElement lib : libraries) {
             String name = getElement(lib.getAsJsonObject(), "name").getAsString();
             if (name.startsWith("io.github.zekerzhayard:ForgeWrapper:")) {
@@ -157,14 +166,13 @@ public class Converter {
             cursepacklocator.addProperty("url", "https://files.minecraftforge.net/maven/");
             libraries.add(cursepacklocator);
         }
-        for (JsonElement lib : getElement(installer ,"libraries").getAsJsonArray()) {
-            JsonObject artifact = getElement(getElement(lib.getAsJsonObject(), "downloads").getAsJsonObject(), "artifact").getAsJsonObject();
-            String path = getElement(artifact, "path").getAsString();
-            if (path.equals(String.format("net/minecraftforge/forge/%s-%s/forge-%s-%s.jar", mcVersion, forgeVersion, mcVersion, forgeVersion))) {
-                artifact.getAsJsonObject().addProperty("url", "https://files.minecraftforge.net/maven/" + path.replace(".jar", "-launcher.jar"));
-            }
-            libraries.add(lib);
-        }
+        Map<String, String> additionalUrls = new HashMap<>();
+        String path = String.format("net/minecraftforge/forge/%s-%s/forge-%s-%s", mcVersion, forgeVersion, mcVersion, forgeVersion);
+        additionalUrls.put(path + "-universal.jar", "https://files.minecraftforge.net/maven/" + path + "-universal.jar");
+        transformLibraries(getElement(installProfile, "libraries").getAsJsonArray(), mavenFiles, additionalUrls);
+        additionalUrls.clear();
+        additionalUrls.put(path + ".jar", "https://files.minecraftforge.net/maven/" + path + "-launcher.jar");
+        transformLibraries(getElement(installer ,"libraries").getAsJsonArray(), libraries, additionalUrls);
 
         patches.addProperty("version", forgeVersion);
         for (JsonElement require : getElement(patches, "requires").getAsJsonArray()) {
@@ -182,5 +190,16 @@ public class Converter {
             return first.get().getValue();
         }
         return JsonNull.INSTANCE;
+    }
+
+    private static void transformLibraries(JsonArray source, JsonArray target, Map<String, String> additionalUrls) {
+        for (JsonElement lib : source) {
+            JsonObject artifact = getElement(getElement(lib.getAsJsonObject(), "downloads").getAsJsonObject(), "artifact").getAsJsonObject();
+            String path = getElement(artifact, "path").getAsString();
+            if (additionalUrls.containsKey(path)) {
+                artifact.getAsJsonObject().addProperty("url", additionalUrls.get(path));
+            }
+            target.add(lib);
+        }
     }
 }

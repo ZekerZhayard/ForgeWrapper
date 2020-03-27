@@ -10,7 +10,7 @@ import io.github.zekerzhayard.forgewrapper.Utils;
 
 public class Main {
     public static void main(String[] args) {
-        Path installer = null, instance = Paths.get(".");
+        Path installer = null, instance = Paths.get("."), multimc = null;
         String cursepack = null;
         try {
             HashMap<String, String> argsMap = parseArgs(args);
@@ -22,6 +22,7 @@ public class Main {
             }
             if (argsMap.containsKey("--instance")) {
                 instance = Paths.get(argsMap.get("--instance"));
+                multimc = instance.getParent();
             }
             if (argsMap.containsKey("--cursepack")) {
                 cursepack = argsMap.get("--cursepack");
@@ -36,7 +37,7 @@ public class Main {
                 Converter.class.getProtectionDomain().getCodeSource().getLocation(),
                 installer.toUri().toURL()
             }, null);
-            ucl.loadClass("io.github.zekerzhayard.forgewrapper.converter.Converter").getMethod("convert", Path.class, Path.class, String.class).invoke(null, installer, instance, cursepack);
+            ucl.loadClass("io.github.zekerzhayard.forgewrapper.converter.Converter").getMethod("convert", Path.class, Path.class, Path.class, String.class).invoke(null, installer, instance, multimc, cursepack);
             System.out.println("Successfully install Forge for MultiMC!");
         } catch (Exception e) {
             System.out.println("Failed to install Forge!");
