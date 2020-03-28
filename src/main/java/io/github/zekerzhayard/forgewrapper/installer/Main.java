@@ -23,12 +23,12 @@ public class Main {
         Path minecraftDir = librariesDir.resolve("net").resolve("minecraft").resolve("client");
         Path forgeDir = librariesDir.resolve("net").resolve("minecraftforge").resolve("forge").resolve(forgeFullVersion);
         if (getAdditionalLibraries(minecraftDir, forgeDir, mcVersion, forgeFullVersion, mcpFullVersion).anyMatch(path -> !Files.exists(path))) {
-            System.out.println("Some extra libraries are missing! Run installer to spawn them now.");
+            System.out.println("Some extra libraries are missing! Run the installer to generate them now.");
             URLClassLoader ucl = URLClassLoader.newInstance(new URL[] {
                 Main.class.getProtectionDomain().getCodeSource().getLocation(),
                 Launcher.class.getProtectionDomain().getCodeSource().getLocation(),
                 forgeDir.resolve("forge-" + forgeFullVersion + "-installer.jar").toUri().toURL()
-            }, null);
+            }, getParentClassLoader());
 
             Class<?> installer = ucl.loadClass("io.github.zekerzhayard.forgewrapper.installer.Installer");
             if (!(boolean) installer.getMethod("install").invoke(null)) {
@@ -55,5 +55,17 @@ public class Main {
             minecraftDir.resolve(mcVersion).resolve("client-" + mcVersion + "-extra.jar"),
             minecraftDir.resolve(mcpFullVersion).resolve("client-" + mcpFullVersion + "-srg.jar")
         );
+    }
+
+    // https://github.com/MinecraftForge/Installer/blob/fe18a164b5ebb15b5f8f33f6a149cc224f446dc2/src/main/java/net/minecraftforge/installer/actions/PostProcessors.java#L287-L303
+    private static ClassLoader getParentClassLoader() {
+        if (!System.getProperty("java.version").startsWith("1.")) {
+            try {
+                return (ClassLoader) ClassLoader.class.getDeclaredMethod("getPlatformClassLoader").invoke(null);
+            } catch (Exception e) {
+                System.out.println("No platform classloader: " + System.getProperty("java.version"));
+            }
+        }
+        return null;
     }
 }
