@@ -8,14 +8,17 @@ import net.minecraftforge.installer.actions.ProgressCallback;
 import net.minecraftforge.installer.json.Install;
 
 public class ClientInstall4MultiMC extends ClientInstall {
-    public ClientInstall4MultiMC(Install profile, ProgressCallback monitor) {
+    protected File libraryDir;
+    protected File minecraftJar;
+
+    public ClientInstall4MultiMC(Install profile, ProgressCallback monitor, File libraryDir, File minecraftJar) {
         super(profile, monitor);
+        this.libraryDir = libraryDir;
+        this.minecraftJar = minecraftJar;
     }
 
     @Override
     public boolean run(File target, Predicate<String> optionals) {
-        File librariesDir = Main.getLibrariesDir();
-        File clientTarget = new File(String.format("%s/com/mojang/minecraft/%s/minecraft-%s-client.jar", librariesDir.getAbsolutePath(), this.profile.getMinecraft(), this.profile.getMinecraft()));
-        return this.processors.process(librariesDir, clientTarget);
+        return this.processors.process(this.libraryDir, this.minecraftJar);
     }
 }

@@ -5,7 +5,7 @@ apply plugin: "idea"
 
 sourceCompatibility = targetCompatibility = 1.8
 
-version = "1.4.1"
+version = "1.4.2"
 group = "io.github.zekerzhayard"
 archivesBaseName = rootProject.name
 
