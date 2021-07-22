@@ -10,4 +10,4 @@ git config --local user.email "actions@github.com"
 
 git add .
 git commit -m "%GITHUB_SHA%"
-git push https://%GITHUB_TOKEN%@github.com/ZekerZhayard/ForgeWrapper.git maven
+git push origin maven
