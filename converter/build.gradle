@@ -1,0 +1,48 @@
+
+plugins {
+    id "java"
+    id "eclipse"
+}
+
+version = "${rootProject.fw_version}${-> getVersionSuffix()}"
+group = "io.github.zekerzhayard"
+archivesBaseName = rootProject.name + "Converter"
+
+configurations {
+    provided {
+        compileOnly.extendsFrom provided
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly "com.google.code.gson:gson:2.8.5"
+    provided rootProject
+}
+
+jar {
+    manifest.attributes rootProject.jar.manifest.attributes
+    manifest.attributes([
+            "Main-Class": "io.github.zekerzhayard.forgewrapper.converter.Main"
+    ])
+
+    from configurations.provided.files.collect {
+        zipTree(it)
+    }
+}
+
+processResources {
+    inputs.property "version", project.version
+    from(sourceSets.main.resources.srcDirs) {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        include "patches/net.minecraftforge.json"
+        expand "version": project.version
+    }
+    from(sourceSets.main.resources.srcDirs) {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        exclude "patches/net.minecraftforge.json"
+    }
+}

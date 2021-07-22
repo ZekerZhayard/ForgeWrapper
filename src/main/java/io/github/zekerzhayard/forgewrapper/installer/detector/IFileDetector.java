@@ -12,10 +12,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -83,30 +88,53 @@ public interface IFileDetector {
 
     /**
      * @param forgeFullVersion Forge full version (e.g. 1.14.4-28.2.0).
+     * @return The list of jvm args.
+     */
+    default List<String> getJvmArgs(String forgeFullVersion) {
+        return this.getDataFromInstaller(forgeFullVersion, "version.json", e -> {
+            JsonElement element = getElement(e.getAsJsonObject().getAsJsonObject("arguments"), "jvm");
+            List<String> args = new ArrayList<>();
+            if (!element.equals(JsonNull.INSTANCE)) {
+                element.getAsJsonArray().iterator().forEachRemaining(je -> args.add(je.getAsString()));
+            }
+            return args;
+        });
+    }
+
+    /**
+     * @param forgeFullVersion Forge full version (e.g. 1.14.4-28.2.0).
+     * @return The main class.
+     */
+    default String getMainClass(String forgeFullVersion) {
+        return this.getDataFromInstaller(forgeFullVersion, "version.json", e -> e.getAsJsonObject().getAsJsonPrimitive("mainClass").getAsString());
+    }
+
+    /**
+     * @param forgeFullVersion Forge full version (e.g. 1.14.4-28.2.0).
      * @return The json object in the-installer-jar-->install_profile.json-->data-->xxx-->client.
      */
     default JsonObject getInstallProfileExtraData(String forgeFullVersion) {
+        return this.getDataFromInstaller(forgeFullVersion, "install_profile.json", e -> e.getAsJsonObject().getAsJsonObject("data"));
+    }
+
+    default <R> R getDataFromInstaller(String forgeFullVersion, String entry, Function<JsonElement, R> function) {
         Path installer = this.getInstallerJar(forgeFullVersion);
         if (isFile(installer)) {
             try (ZipFile zf = new ZipFile(installer.toFile())) {
-                ZipEntry ze = zf.getEntry("install_profile.json");
+                ZipEntry ze = zf.getEntry(entry);
                 if (ze != null) {
                     try (
                         InputStream is = zf.getInputStream(ze);
                         InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8)
                     ) {
-                        for (Map.Entry<String, JsonElement> entry : new JsonParser().parse(isr).getAsJsonObject().entrySet()) {
-                            if (entry.getKey().equals("data")) {
-                                return entry.getValue().getAsJsonObject();
-                            }
-                        }
+                        return function.apply(new JsonParser().parse(isr));
                     }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
-            throw new RuntimeException("Can't detect the forge installer!");
+            throw new RuntimeException("Unable to detect the forge installer!");
         }
         return null;
     }
@@ -123,6 +151,7 @@ public interface IFileDetector {
             Map<String, String> hashMap = new HashMap<>();
 
             // Get all "data/<name>/client" elements.
+            Pattern artifactPattern = Pattern.compile("^\\[(?<groupId>[^:]*):(?<artifactId>[^:]*):(?<version>[^:@]*)(:(?<prefix>[^@]*))?(@(?<type>[^]]*))?]$");
             for (Map.Entry<String, JsonElement> entry : jo.entrySet()) {
                 String clientStr = getElement(entry.getValue().getAsJsonObject(), "client").getAsString();
                 if (entry.getKey().endsWith("_SHA")) {
@@ -132,8 +161,7 @@ public interface IFileDetector {
                         hashMap.put(entry.getKey(), m.group("sha1"));
                     }
                 } else {
-                    Pattern p = Pattern.compile("^\\[(?<groupId>[^:]*):(?<artifactId>[^:]*):(?<version>[^:@]*)(:(?<prefix>[^@]*))?(@(?<type>[^]]*))?]$");
-                    Matcher m = p.matcher(clientStr);
+                    Matcher m = artifactPattern.matcher(clientStr);
                     if (m.find()) {
                         String groupId = nullToDefault(m.group("groupId"), "");
                         String artifactId = nullToDefault(m.group("artifactId"), "");
@@ -152,7 +180,11 @@ public interface IFileDetector {
             // Check all cached libraries.
             boolean checked = true;
             for (Map.Entry<String, Path> entry : libsMap.entrySet()) {
-                checked = checked && this.checkExtraFile(entry.getValue(), hashMap.get(entry.getKey() + "_SHA"));
+                checked = this.checkExtraFile(entry.getValue(), hashMap.get(entry.getKey() + "_SHA"));
+                if (!checked) {
+                    System.out.println("Missing: " + entry.getValue());
+                    break;
+                }
             }
             return checked;
         }

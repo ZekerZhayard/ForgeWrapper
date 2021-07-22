@@ -16,6 +16,10 @@ Allow [MultiMC](https://github.com/MultiMC/MultiMC5) to launch Minecraft 1.13+ w
 
 1. Download Forge installer for Minecraft 1.13+ [here](https://files.minecraftforge.net/).
 2. Download ForgeWrapper jar file at the [release](https://github.com/ZekerZhayard/ForgeWrapper/releases) page.
+3. Since ForgeWrapper 1.5.1, it no longer includes the json converter, so you need to build it by yourself:
+   - [Download](https://github.com/ZekerZhayard/ForgeWrapper/archive/refs/heads/master.zip) ForgeWrapper sources.
+   - Extract the zip and open terminal in the extracted folder.
+   - Run `./gradlew build` command in terminal and get the jar from `./converter/build/libs`
 3. Run the below command in terminal:
    ```
    java -jar <ForgeWrapper.jar> --installer=<forge-installer.jar> [--instance=<instance-path>]

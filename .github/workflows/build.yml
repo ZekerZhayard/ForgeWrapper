@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -18,7 +18,9 @@ jobs:
           java-version: '8.0.302'
           architecture: x64
       - name: Build with Gradle
-        run: ./gradlew.bat build -iS
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build -iS
       - uses: actions/upload-artifact@v2
         with:
           name: Package

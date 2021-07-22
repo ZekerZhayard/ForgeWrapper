@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -19,7 +19,9 @@ jobs:
       - name: Build with Gradle
         env:
           IS_PUBLICATION: true
-        run: ./gradlew.bat publish -iS
+        run: |
+          chmod +x ./gradlew
+          ./gradlew publish -iS
       - uses: actions/upload-artifact@v2
         with:
           name: Package
@@ -49,6 +51,7 @@ jobs:
         with:
           asset_paths: '["./build/libs/*"]'
       - name: Upload to Maven
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./.github/workflows/maven.bat
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: maven
+          folder: build/maven

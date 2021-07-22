@@ -5,6 +5,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -13,13 +14,14 @@ import io.github.zekerzhayard.forgewrapper.installer.detector.DetectorLoader;
 import io.github.zekerzhayard.forgewrapper.installer.detector.IFileDetector;
 
 public class Main {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Throwable {
         List<String> argsList = Stream.of(args).collect(Collectors.toList());
         String mcVersion = argsList.get(argsList.indexOf("--fml.mcVersion") + 1);
         String forgeVersion = argsList.get(argsList.indexOf("--fml.forgeVersion") + 1);
         String forgeFullVersion = mcVersion + "-" + forgeVersion;
 
         IFileDetector detector = DetectorLoader.loadDetector();
+        Bootstrap.bootstrap(detector.getJvmArgs(forgeFullVersion), detector.getMinecraftJar(mcVersion).getFileName().toString(), detector.getLibraryDir().toAbsolutePath().toString());
         if (!detector.checkExtraFiles(forgeFullVersion)) {
             System.out.println("Some extra libraries are missing! Run the installer to generate them now.");
 
@@ -47,7 +49,7 @@ public class Main {
             }
         }
 
-        Launcher.main(args); // TODO: this will be broken in forge 1.17
+        Class.forName(detector.getMainClass(forgeFullVersion)).getMethod("main", String[].class).invoke(null, new Object[] { args });
     }
 
     // https://github.com/MinecraftForge/Installer/blob/fe18a164b5ebb15b5f8f33f6a149cc224f446dc2/src/main/java/net/minecraftforge/installer/actions/PostProcessors.java#L287-L303

@@ -120,11 +120,11 @@ public class Converter {
         }
         Map<String, String> additionalUrls = new HashMap<>();
         String path = String.format("net/minecraftforge/forge/%s-%s/forge-%s-%s", mcVersion, forgeVersion, mcVersion, forgeVersion);
-        additionalUrls.put(path + "-universal.jar", "https://files.minecraftforge.net/maven/" + path + "-universal.jar");
+        additionalUrls.put(path + "-universal.jar", "https://maven.minecraftforge.net/" + path + "-universal.jar");
         transformLibraries(getElement(installProfile, "libraries").getAsJsonArray(), mavenFiles, additionalUrls);
         additionalUrls.clear();
-        additionalUrls.put(path + ".jar", "https://files.minecraftforge.net/maven/" + path + "-launcher.jar");
-        transformLibraries(getElement(installer ,"libraries").getAsJsonArray(), libraries, additionalUrls);
+        additionalUrls.put(path + ".jar", "https://maven.minecraftforge.net/" + path + "-launcher.jar");
+        transformLibraries(getElement(installer, "libraries").getAsJsonArray(), libraries, additionalUrls);
 
         patches.addProperty("version", forgeVersion);
         for (JsonElement require : getElement(patches, "requires").getAsJsonArray()) {

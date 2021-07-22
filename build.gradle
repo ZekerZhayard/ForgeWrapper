@@ -6,6 +6,9 @@ plugins {
 }
 
 sourceCompatibility = targetCompatibility = 1.8
+compileJava {
+    sourceCompatibility = targetCompatibility = 1.8
+}
 
 version = "${fw_version}${-> getVersionSuffix()}"
 group = "io.github.zekerzhayard"
@@ -14,6 +17,9 @@ archivesBaseName = rootProject.name
 configurations {
     provided {
         compileOnly.extendsFrom provided
+    }
+    multirelase {
+        compileOnly.extendsFrom multirelase
     }
 }
 
@@ -26,12 +32,13 @@ repositories {
 }
 
 dependencies {
-    compileOnly "com.google.code.gson:gson:2.8.7"
+    compileOnly "com.google.code.gson:gson:2.8.5"
     compileOnly "cpw.mods:modlauncher:8.0.9"
     compileOnly "net.minecraftforge:installer:2.1.4"
     compileOnly "net.sf.jopt-simple:jopt-simple:5.0.4"
 
     provided project(":legacy")
+    multirelase project(":jigsaw")
 }
 
 java {
@@ -48,6 +55,7 @@ jar {
         "Implementation-Vendor" :"ZekerZhayard",
         "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
         "Automatic-Module-Name": "${project.group}.${project.archivesBaseName}".toString().toLowerCase(),
+        "Multi-Release": "true",
         "Main-Class": "io.github.zekerzhayard.forgewrapper.converter.Main",
         "GitCommit": String.valueOf(System.getenv("GITHUB_SHA"))
     ])
@@ -55,30 +63,12 @@ jar {
     from configurations.provided.files.collect {
         zipTree(it)
     }
-}
 
-/*task sourcesJar(type: Jar) {
-    manifest {
-        attributes(jar.manifest.attributes)
-    }
-    from sourceSets.main.allSource
-    archiveFileName = "${archivesBaseName}-${archiveVersion.get()}-sources.${archiveExtension.get()}"
-}
-
-artifacts {
-    archives sourcesJar
-}*/
-
-processResources {
-    inputs.property "version", project.version
-    from(sourceSets.main.resources.srcDirs) {
-        duplicatesStrategy = DuplicatesStrategy.INCLUDE
-        include "patches/net.minecraftforge.json"
-        expand "version": project.version
-    }
-    from(sourceSets.main.resources.srcDirs) {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        exclude "patches/net.minecraftforge.json"
+    into "META-INF/versions/9", {
+        from configurations.multirelase.files.collect {
+            zipTree(it)
+        }
+        exclude "META-INF/**"
     }
 }
 
