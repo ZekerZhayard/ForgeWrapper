@@ -3,7 +3,6 @@ package io.github.zekerzhayard.forgewrapper.installer;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +16,8 @@ public class Main {
     public static void main(String[] args) throws Exception {
         List<String> argsList = Stream.of(args).collect(Collectors.toList());
         String mcVersion = argsList.get(argsList.indexOf("--fml.mcVersion") + 1);
-        String forgeFullVersion = mcVersion + "-" + argsList.get(argsList.indexOf("--fml.forgeVersion") + 1);
+        String forgeVersion = argsList.get(argsList.indexOf("--fml.forgeVersion") + 1);
+        String forgeFullVersion = mcVersion + "-" + forgeVersion;
 
         IFileDetector detector = DetectorLoader.loadDetector();
         if (!detector.checkExtraFiles(forgeFullVersion)) {
@@ -26,13 +26,13 @@ public class Main {
             // Check installer jar.
             Path installerJar = detector.getInstallerJar(forgeFullVersion);
             if (!IFileDetector.isFile(installerJar)) {
-                throw new RuntimeException("Can't detect the forge installer!");
+                throw new RuntimeException("Unable to detect the forge installer!");
             }
 
             // Check vanilla Minecraft jar.
             Path minecraftJar = detector.getMinecraftJar(mcVersion);
             if (!IFileDetector.isFile(minecraftJar)) {
-                throw new RuntimeException("Can't detect the Minecraft jar!");
+                throw new RuntimeException("Unable to detect the Minecraft jar!");
             }
 
             try (URLClassLoader ucl = URLClassLoader.newInstance(new URL[] {
@@ -41,13 +41,13 @@ public class Main {
                 installerJar.toUri().toURL()
             }, getParentClassLoader())) {
                 Class<?> installer = ucl.loadClass("io.github.zekerzhayard.forgewrapper.installer.Installer");
-                if (!(boolean) installer.getMethod("install", File.class, File.class).invoke(null, detector.getLibraryDir().toFile(), minecraftJar.toFile())) {
+                if (!(boolean) installer.getMethod("install", File.class, File.class, File.class, String.class).invoke(null, detector.getLibraryDir().toFile(), minecraftJar.toFile(), installerJar.toFile(), forgeVersion)) {
                     return;
                 }
             }
         }
 
-        Launcher.main(args);
+        Launcher.main(args); // TODO: this will be broken in forge 1.17
     }
 
     // https://github.com/MinecraftForge/Installer/blob/fe18a164b5ebb15b5f8f33f6a149cc224f446dc2/src/main/java/net/minecraftforge/installer/actions/PostProcessors.java#L287-L303

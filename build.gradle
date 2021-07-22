@@ -1,39 +1,111 @@
-apply plugin: "base"
-apply plugin: "java"
-apply plugin: "eclipse"
-apply plugin: "idea"
+
+plugins {
+    id "java"
+    id "eclipse"
+    id "maven-publish"
+}
 
 sourceCompatibility = targetCompatibility = 1.8
 
-version = "1.4.2"
+version = "${fw_version}${-> getVersionSuffix()}"
 group = "io.github.zekerzhayard"
 archivesBaseName = rootProject.name
 
+configurations {
+    provided {
+        compileOnly.extendsFrom provided
+    }
+}
+
 repositories {
+    mavenCentral()
     maven {
         name = "forge"
-        url = "https://files.minecraftforge.net/maven/"
+        url = "https://maven.minecraftforge.net/"
     }
 }
 
 dependencies {
-    compile "cpw.mods:modlauncher:4.1.0"
-    compile "net.minecraftforge:forge:1.14.4-28.2.0:installer"
+    compileOnly "com.google.code.gson:gson:2.8.7"
+    compileOnly "cpw.mods:modlauncher:8.0.9"
+    compileOnly "net.minecraftforge:installer:2.1.4"
+    compileOnly "net.sf.jopt-simple:jopt-simple:5.0.4"
+
+    provided project(":legacy")
+}
+
+java {
+    withSourcesJar()
 }
 
 jar {
-    manifest.attributes(
-            "Main-Class": "io.github.zekerzhayard.forgewrapper.converter.Main"
-    )
+    manifest.attributes([
+        "Specification-Title": "${project.name}",
+        "Specification-Vendor": "ZekerZhayard",
+        "Specification-Version": "${project.version}".split("-")[0],
+        "Implementation-Title": "${project.name}",
+        "Implementation-Version": "${project.version}",
+        "Implementation-Vendor" :"ZekerZhayard",
+        "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+        "Automatic-Module-Name": "${project.group}.${project.archivesBaseName}".toString().toLowerCase(),
+        "Main-Class": "io.github.zekerzhayard.forgewrapper.converter.Main",
+        "GitCommit": String.valueOf(System.getenv("GITHUB_SHA"))
+    ])
+
+    from configurations.provided.files.collect {
+        zipTree(it)
+    }
 }
+
+/*task sourcesJar(type: Jar) {
+    manifest {
+        attributes(jar.manifest.attributes)
+    }
+    from sourceSets.main.allSource
+    archiveFileName = "${archivesBaseName}-${archiveVersion.get()}-sources.${archiveExtension.get()}"
+}
+
+artifacts {
+    archives sourcesJar
+}*/
 
 processResources {
     inputs.property "version", project.version
     from(sourceSets.main.resources.srcDirs) {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
         include "patches/net.minecraftforge.json"
         expand "version": project.version
     }
     from(sourceSets.main.resources.srcDirs) {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         exclude "patches/net.minecraftforge.json"
     }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId "${project.group}"
+            artifactId "${project.archivesBaseName}"
+            version "${project.version}"
+
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url = layout.buildDirectory.dir("maven")
+        }
+    }
+
+}
+tasks.publish.dependsOn build
+
+static String getVersionSuffix() {
+    if (System.getenv("IS_PUBLICATION") != null) {
+        return ""
+    } else if (System.getenv("GITHUB_RUN_NUMBER") != null && System.getenv("GITHUB_SHA") != null) {
+        return "-s." + System.getenv("GITHUB_RUN_NUMBER") + "-" + System.getenv("GITHUB_SHA").substring(0, 7)
+    }
+    return "-LOCAL"
 }
