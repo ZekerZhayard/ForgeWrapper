@@ -2,7 +2,7 @@
 
 git clone -b maven https://%GITHUB_TOKEN%@github.com/ZekerZhayard/ForgeWrapper.git .\maven
 
-xcopy ".\build\maven\" ".\maven\" /S /Y
+xcopy ".\build\maven" ".\maven\" /S /Y
 cd ".\maven\"
 
 git config --local user.name "GitHub Actions"
