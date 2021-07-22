@@ -1,6 +1,6 @@
 @ECHO OFF
 
-git clone -b maven https://github.com/ZekerZhayard/ForgeWrapper.git .\maven
+git clone -b maven https://%GITHUB_TOKEN%@github.com/ZekerZhayard/ForgeWrapper.git .\maven
 
 xcopy ".\build\maven\" ".\maven\" /S /Y
 cd ".\maven\"
