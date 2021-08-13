@@ -15,7 +15,8 @@ public class ModuleUtil {
         // nothing to do with Java 8
     }
 
-    public static void setupBootstrapLauncher() {
+    public static Class<?> setupBootstrapLauncher(Class<?> mainClass) {
         // nothing to do with Java 8
+        return mainClass;
     }
 }

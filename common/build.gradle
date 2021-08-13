@@ -1,0 +1,11 @@
+
+plugins {
+    id "java"
+    id "eclipse"
+    id "maven-publish"
+}
+
+sourceCompatibility = targetCompatibility = 1.8
+compileJava {
+    sourceCompatibility = targetCompatibility = 1.8
+}

@@ -1,11 +1,8 @@
 package io.github.zekerzhayard.forgewrapper.installer;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import io.github.zekerzhayard.forgewrapper.installer.util.ModuleUtil;
 
@@ -14,7 +11,7 @@ public class Bootstrap {
         // Replace all placeholders
         List<String> replacedJvmArgs = new ArrayList<>();
         for (String arg : jvmArgs) {
-            replacedJvmArgs.add(arg.replace("${classpath}", System.getProperty("java.class.path").replace(File.separator, "/")).replace("${classpath_separator}", File.pathSeparator).replace("${library_directory}", libraryDir));
+            replacedJvmArgs.add(arg.replace("${classpath}", System.getProperty("java.class.path").replace(File.separator, "/")).replace("${classpath_separator}", File.pathSeparator).replace("${library_directory}", libraryDir).replace("${version_name}", minecraftJar.substring(0, minecraftJar.lastIndexOf('.'))));
         }
         jvmArgs = replacedJvmArgs;
 
@@ -47,21 +44,8 @@ public class Bootstrap {
                 String[] prop = arg.substring(2).split("=", 2);
 
                 if (prop[0].equals("ignoreList")) {
-                    // The default ignoreList is too broad and may cause some problems, so we define it more precisely.
-                    String[] ignores = (prop[1] + ",NewLaunch.jar,ForgeWrapper-," + minecraftJar).split(",");
-                    List<String> ignoreList = new ArrayList<>();
-                    for (String classPathName : System.getProperty("java.class.path").replace(File.separator, "/").split(File.pathSeparator)) {
-                        Path classPath = Paths.get(classPathName);
-                        String fileName = classPath.getFileName().toString();
-                        if (Stream.of(ignores).anyMatch(fileName::contains)) {
-                            String absolutePath = classPath.toAbsolutePath().toString();
-                            if (absolutePath.contains(",")) {
-                                absolutePath = absolutePath.substring(absolutePath.lastIndexOf(","));
-                            }
-                            ignoreList.add(absolutePath.replace(File.separator, "/"));
-                        }
-                    }
-                    System.setProperty(prop[0], String.join(",", ignoreList));
+                    // The default ignoreList may cause some problems, so we define it more precisely.
+                    System.setProperty(prop[0], prop[1] + ",NewLaunch.jar,ForgeWrapper-," + minecraftJar);
                 } else {
                     System.setProperty(prop[0], prop[1]);
                 }
@@ -73,6 +57,5 @@ public class Bootstrap {
         }
         ModuleUtil.addExports(addExports);
         ModuleUtil.addOpens(addOpens);
-        ModuleUtil.setupBootstrapLauncher();
     }
 }

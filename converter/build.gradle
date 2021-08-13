@@ -8,9 +8,14 @@ version = "${rootProject.fw_version}${-> getVersionSuffix()}"
 group = "io.github.zekerzhayard"
 archivesBaseName = rootProject.name + "Converter"
 
+sourceCompatibility = targetCompatibility = 1.8
+compileJava {
+    sourceCompatibility = targetCompatibility = 1.8
+}
+
 configurations {
     provided {
-        compileOnly.extendsFrom provided
+        implementation.extendsFrom provided
     }
 }
 
@@ -30,6 +35,7 @@ jar {
     ])
 
     from configurations.provided.files.collect {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         zipTree(it)
     }
 }

@@ -20,6 +20,8 @@ jobs:
         env:
           IS_PUBLICATION: true
         run: |
+          git clone -b maven https://github.com/ZekerZhayard/ForgeWrapper.git ./build/maven
+          rm -rf ./build/maven/.git/*
           chmod +x ./gradlew
           ./gradlew publish -iS
       - uses: actions/upload-artifact@v2

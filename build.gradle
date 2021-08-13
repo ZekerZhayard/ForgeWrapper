@@ -16,10 +16,10 @@ archivesBaseName = rootProject.name
 
 configurations {
     provided {
-        compileOnly.extendsFrom provided
+        implementation.extendsFrom provided
     }
     multirelase {
-        compileOnly.extendsFrom multirelase
+        implementation.extendsFrom multirelase
     }
 }
 
@@ -37,6 +37,7 @@ dependencies {
     compileOnly "net.minecraftforge:installer:2.1.4"
     compileOnly "net.sf.jopt-simple:jopt-simple:5.0.4"
 
+    provided project(":common")
     provided project(":legacy")
     multirelase project(":jigsaw")
 }
@@ -56,7 +57,6 @@ jar {
         "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
         "Automatic-Module-Name": "${project.group}.${project.archivesBaseName}".toString().toLowerCase(),
         "Multi-Release": "true",
-        "Main-Class": "io.github.zekerzhayard.forgewrapper.converter.Main",
         "GitCommit": String.valueOf(System.getenv("GITHUB_SHA"))
     ])
 
@@ -87,7 +87,6 @@ publishing {
             url = layout.buildDirectory.dir("maven")
         }
     }
-
 }
 tasks.publish.dependsOn build
 

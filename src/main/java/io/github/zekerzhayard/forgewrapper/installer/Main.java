@@ -5,13 +5,13 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import cpw.mods.modlauncher.Launcher;
 import io.github.zekerzhayard.forgewrapper.installer.detector.DetectorLoader;
 import io.github.zekerzhayard.forgewrapper.installer.detector.IFileDetector;
+import io.github.zekerzhayard.forgewrapper.installer.util.ModuleUtil;
 
 public class Main {
     public static void main(String[] args) throws Throwable {
@@ -49,7 +49,8 @@ public class Main {
             }
         }
 
-        Class.forName(detector.getMainClass(forgeFullVersion)).getMethod("main", String[].class).invoke(null, new Object[] { args });
+        Class<?> mainClass = ModuleUtil.setupBootstrapLauncher(Class.forName(detector.getMainClass(forgeFullVersion)));
+        mainClass.getMethod("main", String[].class).invoke(null, new Object[] { args });
     }
 
     // https://github.com/MinecraftForge/Installer/blob/fe18a164b5ebb15b5f8f33f6a149cc224f446dc2/src/main/java/net/minecraftforge/installer/actions/PostProcessors.java#L287-L303
