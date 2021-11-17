@@ -23,7 +23,7 @@ public class Main {
         IFileDetector detector = DetectorLoader.loadDetector();
         Bootstrap.bootstrap(detector.getJvmArgs(forgeFullVersion), detector.getMinecraftJar(mcVersion).getFileName().toString(), detector.getLibraryDir().toAbsolutePath().toString());
         if (!detector.checkExtraFiles(forgeFullVersion)) {
-            System.out.println("Some extra libraries are missing! Run the installer to generate them now.");
+            System.out.println("Some extra libraries are missing! Running the installer to generate them now.");
 
             // Check installer jar.
             Path installerJar = detector.getInstallerJar(forgeFullVersion);
