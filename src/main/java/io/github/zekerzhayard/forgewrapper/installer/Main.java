@@ -21,9 +21,13 @@ public class Main {
         String forgeFullVersion = mcVersion + "-" + forgeVersion;
 
         IFileDetector detector = DetectorLoader.loadDetector();
-        Bootstrap.bootstrap(detector.getJvmArgs(forgeFullVersion), detector.getMinecraftJar(mcVersion).getFileName().toString(), detector.getLibraryDir().toAbsolutePath().toString());
+        try {
+            Bootstrap.bootstrap(detector.getJvmArgs(forgeFullVersion), detector.getMinecraftJar(mcVersion).getFileName().toString(), detector.getLibraryDir().toAbsolutePath().toString());
+        } catch (Throwable ignored) {
+            // Avoid this bunch of hacks that nuke the whole wrapper.
+        }
         if (!detector.checkExtraFiles(forgeFullVersion)) {
-            System.out.println("Some extra libraries are missing! Run the installer to generate them now.");
+            System.out.println("Some extra libraries are missing! Running the installer to generate them now.");
 
             // Check installer jar.
             Path installerJar = detector.getInstallerJar(forgeFullVersion);
@@ -41,7 +45,7 @@ public class Main {
                 Main.class.getProtectionDomain().getCodeSource().getLocation(),
                 Launcher.class.getProtectionDomain().getCodeSource().getLocation(),
                 installerJar.toUri().toURL()
-            }, getParentClassLoader())) {
+            }, ModuleUtil.getPlatformClassLoader())) {
                 Class<?> installer = ucl.loadClass("io.github.zekerzhayard.forgewrapper.installer.Installer");
                 if (!(boolean) installer.getMethod("install", File.class, File.class, File.class, String.class).invoke(null, detector.getLibraryDir().toFile(), minecraftJar.toFile(), installerJar.toFile(), forgeVersion)) {
                     return;
@@ -51,17 +55,5 @@ public class Main {
 
         Class<?> mainClass = ModuleUtil.setupBootstrapLauncher(Class.forName(detector.getMainClass(forgeFullVersion)));
         mainClass.getMethod("main", String[].class).invoke(null, new Object[] { args });
-    }
-
-    // https://github.com/MinecraftForge/Installer/blob/fe18a164b5ebb15b5f8f33f6a149cc224f446dc2/src/main/java/net/minecraftforge/installer/actions/PostProcessors.java#L287-L303
-    private static ClassLoader getParentClassLoader() {
-        if (!System.getProperty("java.version").startsWith("1.")) {
-            try {
-                return (ClassLoader) ClassLoader.class.getDeclaredMethod("getPlatformClassLoader").invoke(null);
-            } catch (Exception e) {
-                System.out.println("No platform classloader: " + System.getProperty("java.version"));
-            }
-        }
-        return null;
     }
 }

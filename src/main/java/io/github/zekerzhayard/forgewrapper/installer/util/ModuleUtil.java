@@ -19,4 +19,9 @@ public class ModuleUtil {
         // nothing to do with Java 8
         return mainClass;
     }
+
+    public static ClassLoader getPlatformClassLoader() {
+        // PlatformClassLoader does not exist in Java 8
+        return null;
+    }
 }

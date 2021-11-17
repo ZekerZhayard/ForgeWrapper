@@ -15,7 +15,7 @@
   "mavenFiles": [
     {
       "name": "net.minecraftforge:forge:{VERSION}-{FORGE_VERSION}:installer",
-      "url": "https://files.minecraftforge.net/maven/"
+      "url": "https://maven.minecraftforge.net/"
     }
   ],
   "libraries": [

@@ -102,6 +102,10 @@ public class ModuleUtil {
         TypeToAdd.OPENS.implAdd(opens);
     }
 
+    public static ClassLoader getPlatformClassLoader() {
+        return ClassLoader.getPlatformClassLoader();
+    }
+
     private enum TypeToAdd {
         EXPORTS("Exports"),
         OPENS("Opens");

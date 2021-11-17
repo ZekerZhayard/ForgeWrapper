@@ -75,7 +75,7 @@ public class Converter {
                 throw new RuntimeException("The zip file is invalid!");
             }
             InputStreamReader isr = new InputStreamReader(zf.getInputStream(versionFile), StandardCharsets.UTF_8);
-            return new JsonParser().parse(isr).getAsJsonObject();
+            return JsonParser.parseReader(isr).getAsJsonObject();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -84,7 +84,7 @@ public class Converter {
     // Convert mmc-pack.json:
     //   - Replace Minecraft version
     private static JsonObject convertPackJson(String mcVersion) {
-        JsonObject pack = new JsonParser().parse(new InputStreamReader(Converter.class.getResourceAsStream("/mmc-pack.json"))).getAsJsonObject();
+        JsonObject pack = JsonParser.parseReader(new InputStreamReader(Converter.class.getResourceAsStream("/mmc-pack.json"))).getAsJsonObject();
 
         for (JsonElement component : getElement(pack, "components").getAsJsonArray()) {
             JsonObject componentObject = component.getAsJsonObject();
@@ -101,7 +101,7 @@ public class Converter {
     //   - Add forge-launcher url
     //   - Replace Minecraft & Forge versions
     private static JsonObject convertPatchesJson(JsonObject installer, JsonObject installProfile, String mcVersion, String forgeVersion, StringBuilder wrapperVersion) {
-        JsonObject patches = new JsonParser().parse(new InputStreamReader(Converter.class.getResourceAsStream("/patches/net.minecraftforge.json"))).getAsJsonObject();
+        JsonObject patches = JsonParser.parseReader(new InputStreamReader(Converter.class.getResourceAsStream("/patches/net.minecraftforge.json"))).getAsJsonObject();
         JsonArray mavenFiles = getElement(patches, "mavenFiles").getAsJsonArray();
         JsonArray libraries = getElement(patches, "libraries").getAsJsonArray();
 

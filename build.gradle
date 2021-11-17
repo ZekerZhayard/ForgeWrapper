@@ -32,13 +32,12 @@ repositories {
 }
 
 dependencies {
-    compileOnly "com.google.code.gson:gson:2.8.5"
+    compileOnly "com.google.code.gson:gson:2.8.7"
     compileOnly "cpw.mods:modlauncher:8.0.9"
-    compileOnly "net.minecraftforge:installer:2.1.4"
+    compileOnly "net.minecraftforge:installer:2.1.9"
     compileOnly "net.sf.jopt-simple:jopt-simple:5.0.4"
 
     provided project(":common")
-    provided project(":legacy")
     multirelase project(":jigsaw")
 }
 

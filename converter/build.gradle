@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly "com.google.code.gson:gson:2.8.5"
+    compileOnly "com.google.code.gson:gson:2.8.7"
     provided rootProject
 }
 
