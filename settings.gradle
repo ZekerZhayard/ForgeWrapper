@@ -2,4 +2,5 @@ rootProject.name = 'ForgeWrapper'
 
 include 'common'
 include 'converter'
+include 'legacy'
 include 'jigsaw'

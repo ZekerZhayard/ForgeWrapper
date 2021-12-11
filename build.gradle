@@ -38,6 +38,7 @@ dependencies {
     compileOnly "net.sf.jopt-simple:jopt-simple:5.0.4"
 
     provided project(":common")
+    provided project(":legacy")
     multirelase project(":jigsaw")
 }
 

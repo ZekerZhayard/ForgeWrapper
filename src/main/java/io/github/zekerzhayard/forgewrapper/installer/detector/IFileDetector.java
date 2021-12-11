@@ -109,6 +109,14 @@ public interface IFileDetector {
 
     /**
      * @param forgeFullVersion Forge full version (e.g. 1.14.4-28.2.0).
+     * @return The installer specification version.
+     */
+    default int getInstallProfileSpec(String forgeFullVersion) {
+        return this.getDataFromInstaller(forgeFullVersion, "install_profile.json", e -> e.getAsJsonObject().getAsJsonPrimitive("spec").getAsInt());
+    }
+
+    /**
+     * @param forgeFullVersion Forge full version (e.g. 1.14.4-28.2.0).
      * @return The json object in the-installer-jar-->install_profile.json-->data-->xxx-->client.
      */
     default JsonObject getInstallProfileExtraData(String forgeFullVersion) {
@@ -149,7 +157,7 @@ public interface IFileDetector {
             Map<String, String> hashMap = new HashMap<>();
 
             // Get all "data/<name>/client" elements.
-            Pattern artifactPattern = Pattern.compile("^\\[(?<groupId>[^:]*):(?<artifactId>[^:]*):(?<version>[^:@]*)(:(?<prefix>[^@]*))?(@(?<type>[^]]*))?]$");
+            Pattern artifactPattern = Pattern.compile("^\\[(?<groupId>[^:]*):(?<artifactId>[^:]*):(?<version>[^:@]*)(:(?<classifier>[^@]*))?(@(?<type>[^]]*))?]$");
             for (Map.Entry<String, JsonElement> entry : jo.entrySet()) {
                 String clientStr = getElement(entry.getValue().getAsJsonObject(), "client").getAsString();
                 if (entry.getKey().endsWith("_SHA")) {
@@ -164,13 +172,13 @@ public interface IFileDetector {
                         String groupId = nullToDefault(m.group("groupId"), "");
                         String artifactId = nullToDefault(m.group("artifactId"), "");
                         String version = nullToDefault(m.group("version"), "");
-                        String prefix = nullToDefault(m.group("prefix"), "");
+                        String classifier = nullToDefault(m.group("classifier"), "");
                         String type = nullToDefault(m.group("type"), "jar");
                         libsMap.put(entry.getKey(), this.getLibraryDir()
                             .resolve(groupId.replace('.', File.separatorChar))
                             .resolve(artifactId)
                             .resolve(version)
-                            .resolve(artifactId + "-" + version + (prefix.equals("") ? "" : "-") + prefix + "." + type).toAbsolutePath());
+                            .resolve(artifactId + "-" + version + (classifier.equals("") ? "" : "-") + classifier + "." + type).toAbsolutePath());
                     }
                 }
             }
