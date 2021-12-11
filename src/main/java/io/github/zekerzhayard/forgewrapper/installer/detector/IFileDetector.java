@@ -205,7 +205,7 @@ public interface IFileDetector {
      * @return True represents the file is ready.
      */
     default boolean checkExtraFile(Path path, String sha1) {
-        return Files.isRegularFile(path) && (sha1 == null || sha1.equals("") || sha1.toLowerCase(Locale.ENGLISH).equals(getFileSHA1(path)));
+        return sha1 == null || sha1.equals("") || (isFile(path) && sha1.toLowerCase(Locale.ENGLISH).equals(getFileSHA1(path)));
     }
 
     static boolean isFile(Path path) {
