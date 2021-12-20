@@ -47,7 +47,7 @@ public class Main {
                 installerJar.toUri().toURL()
             }, ModuleUtil.getPlatformClassLoader())) {
                 Class<?> installer = ucl.loadClass("io.github.zekerzhayard.forgewrapper.installer.Installer");
-                if (!(boolean) installer.getMethod("install", File.class, File.class, File.class, int.class).invoke(null, detector.getLibraryDir().toFile(), minecraftJar.toFile(), installerJar.toFile(), detector.getInstallProfileSpec(forgeFullVersion))) {
+                if (!(boolean) installer.getMethod("install", File.class, File.class, File.class).invoke(null, detector.getLibraryDir().toFile(), minecraftJar.toFile(), installerJar.toFile())) {
                     return;
                 }
             }

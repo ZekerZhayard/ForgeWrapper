@@ -1,7 +1,6 @@
 package io.github.zekerzhayard.forgewrapper.installer;
 
 import java.io.File;
-import java.lang.reflect.Method;
 
 import io.github.zekerzhayard.forgewrapper.installer.util.AbstractInstaller;
 import io.github.zekerzhayard.forgewrapper.installer.util.InstallerV0;
@@ -11,10 +10,10 @@ import net.minecraftforge.installer.json.Install;
 import net.minecraftforge.installer.json.Util;
 
 public class Installer {
-    public static boolean install(File libraryDir, File minecraftJar, File installerJar, int installerSpec) {
-        AbstractInstaller installer = getInstaller(installerSpec);
+    public static boolean install(File libraryDir, File minecraftJar, File installerJar) {
+        Install profile = Util.loadInstallProfile();
+        AbstractInstaller installer = getInstaller(profile);
         ProgressCallback monitor = ProgressCallback.withOutputs(System.out);
-        Install profile = installer.loadInstallProfile();
         if (System.getProperty("java.net.preferIPv4Stack") == null) {
             System.setProperty("java.net.preferIPv4Stack", "true");
         }
@@ -26,22 +25,7 @@ public class Installer {
         return installer.runClientInstall(profile, monitor, libraryDir, minecraftJar, installerJar);
     }
 
-    private static AbstractInstaller getInstaller(int installerSpec) {
-        switch (installerSpec) {
-            case 0: {
-                Boolean isV1 = false;
-                Method[] methods = Util.class.getDeclaredMethods();
-                for (Method method: methods) {
-                    String methodName = method.toString();
-                    if (methodName.contains("InstallV1") && methodName.contains("loadInstallProfile")) {
-                        isV1 = true;
-                        break;
-                    }
-                }
-                return isV1 ? new InstallerV1() : new InstallerV0();
-            }
-            case 1: return new InstallerV1();
-            default: throw new IllegalArgumentException("Invalid installer profile spec: " + installerSpec);
-        }
+    private static AbstractInstaller getInstaller(Install profile) {
+        return profile.getClass().toString().contains("InstallV1") ? new InstallerV1() : new InstallerV0();
     }
 }
