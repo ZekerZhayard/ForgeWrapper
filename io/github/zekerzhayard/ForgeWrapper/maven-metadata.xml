@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>io.github.zekerzhayard</groupId>
+  <artifactId>ForgeWrapper</artifactId>
+  <versioning>
+    <latest>mmc1</latest>
+    <release>mmc1</release>
+    <versions>
+      <version>mmc1</version>
+    </versions>
+    <lastUpdated>20211222145551</lastUpdated>
+  </versioning>
+</metadata>

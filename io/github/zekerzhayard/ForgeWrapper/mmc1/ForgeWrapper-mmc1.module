@@ -1,0 +1,103 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "io.github.zekerzhayard",
+    "module": "ForgeWrapper",
+    "version": "mmc1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.1.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "ForgeWrapper-mmc1.jar",
+          "url": "ForgeWrapper-mmc1.jar",
+          "size": 34656,
+          "sha512": "a7303872869b8037c183855fb63707e40a6ce47ba65450a4e94a5c7149208a6d2ffd50c993f9b280dcec03d419d3f82455cf5b5b7408c5b21bb07036721741db",
+          "sha256": "8a7549cab3e4097d063466dd819b8d4f8a31aed2d4c739b4763bdfd426312c72",
+          "sha1": "5dbf9372e1a0da00d8dea43e520c4afa1edc9d9f",
+          "md5": "4fa1118c122a7037afd557e36c705c80"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "ForgeWrapper",
+          "module": "common",
+          "version": {
+            "requires": "unspecified"
+          }
+        },
+        {
+          "group": "ForgeWrapper",
+          "module": "legacy",
+          "version": {
+            "requires": "unspecified"
+          }
+        },
+        {
+          "group": "ForgeWrapper",
+          "module": "jigsaw",
+          "version": {
+            "requires": "unspecified"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ForgeWrapper-mmc1.jar",
+          "url": "ForgeWrapper-mmc1.jar",
+          "size": 34656,
+          "sha512": "a7303872869b8037c183855fb63707e40a6ce47ba65450a4e94a5c7149208a6d2ffd50c993f9b280dcec03d419d3f82455cf5b5b7408c5b21bb07036721741db",
+          "sha256": "8a7549cab3e4097d063466dd819b8d4f8a31aed2d4c739b4763bdfd426312c72",
+          "sha1": "5dbf9372e1a0da00d8dea43e520c4afa1edc9d9f",
+          "md5": "4fa1118c122a7037afd557e36c705c80"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "ForgeWrapper-mmc1-sources.jar",
+          "url": "ForgeWrapper-mmc1-sources.jar",
+          "size": 11140,
+          "sha512": "7668954484cbde3d0ef2082150bfb433d1377b3399f9a42fdf7be1b0c897b68d388d510ddca7c23f54ede800e6087f7d354b1f11598206571ccea38090fcdc29",
+          "sha256": "9407f0c2fa59669dab996b1be705e4e0e1880419803dd24ff3c1124939e6c33b",
+          "sha1": "b113b4956ca66b0322cb0e2a6505890cc092d62e",
+          "md5": "b8d8bdf032e8c4ec63e7d7e23c4edb8c"
+        }
+      ]
+    }
+  ]
+}
