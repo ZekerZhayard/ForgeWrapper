@@ -109,20 +109,13 @@ public interface IFileDetector {
 
     /**
      * @param forgeFullVersion Forge full version (e.g. 1.14.4-28.2.0).
-     * @return The installer specification version.
-     */
-    default int getInstallProfileSpec(String forgeFullVersion) {
-        return this.getDataFromInstaller(forgeFullVersion, "install_profile.json", e -> e.getAsJsonObject().getAsJsonPrimitive("spec").getAsInt());
-    }
-
-    /**
-     * @param forgeFullVersion Forge full version (e.g. 1.14.4-28.2.0).
      * @return The json object in the-installer-jar-->install_profile.json-->data-->xxx-->client.
      */
     default JsonObject getInstallProfileExtraData(String forgeFullVersion) {
         return this.getDataFromInstaller(forgeFullVersion, "install_profile.json", e -> e.getAsJsonObject().getAsJsonObject("data"));
     }
 
+    @SuppressWarnings("deprecation")
     default <R> R getDataFromInstaller(String forgeFullVersion, String entry, Function<JsonElement, R> function) {
         Path installer = this.getInstallerJar(forgeFullVersion);
         if (isFile(installer)) {
@@ -186,7 +179,7 @@ public interface IFileDetector {
             // Check all cached libraries.
             boolean checked = true;
             for (Map.Entry<String, Path> entry : libsMap.entrySet()) {
-                checked = this.checkExtraFile(entry.getValue(), hashMap.get(entry.getKey() + "_SHA"));
+                checked = checkExtraFile(entry.getValue(), hashMap.get(entry.getKey() + "_SHA"));
                 if (!checked) {
                     System.out.println("Missing: " + entry.getValue());
                     break;
@@ -204,7 +197,7 @@ public interface IFileDetector {
      * @param sha1 The sha1 defined in installer.
      * @return True represents the file is ready.
      */
-    default boolean checkExtraFile(Path path, String sha1) {
+    static boolean checkExtraFile(Path path, String sha1) {
         return sha1 == null || sha1.equals("") || (isFile(path) && sha1.toLowerCase(Locale.ENGLISH).equals(getFileSHA1(path)));
     }
 
