@@ -27,10 +27,16 @@ public class MultiMCFileDetector implements IFileDetector {
     }
 
     @Override
-    public Path getInstallerJar(String forgeFullVersion) {
-        Path path = IFileDetector.super.getInstallerJar(forgeFullVersion);
+    public Path getInstallerJar(String forgeGroup, String forgeFullVersion) {
+        Path path = IFileDetector.super.getInstallerJar(forgeGroup, forgeFullVersion);
         if (path == null) {
-            return this.installerJar != null ? this.installerJar : (this.installerJar = this.getLibraryDir().resolve("net").resolve("minecraftforge").resolve("forge").resolve(forgeFullVersion).resolve("forge-" + forgeFullVersion + "-installer.jar").toAbsolutePath());
+            if (this.installerJar == null) {
+                Path installerBase = this.getLibraryDir();
+                for (String dir : forgeGroup.split("\\."))
+                    installerBase = installerBase.resolve(dir);
+                this.installerJar = installerBase.resolve("forge").resolve(forgeFullVersion).resolve("forge-" + forgeFullVersion + "-installer.jar").toAbsolutePath();
+            }
+            return this.installerJar;
         }
         return path;
     }

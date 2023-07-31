@@ -17,20 +17,21 @@ public class Main {
     public static void main(String[] args) throws Throwable {
         List<String> argsList = Stream.of(args).collect(Collectors.toList());
         String mcVersion = argsList.get(argsList.indexOf("--fml.mcVersion") + 1);
+        String forgeGroup = argsList.get(argsList.indexOf("--fml.forgeGroup") + 1);
         String forgeVersion = argsList.get(argsList.indexOf("--fml.forgeVersion") + 1);
         String forgeFullVersion = mcVersion + "-" + forgeVersion;
 
         IFileDetector detector = DetectorLoader.loadDetector();
         try {
-            Bootstrap.bootstrap(detector.getJvmArgs(forgeFullVersion), detector.getMinecraftJar(mcVersion).getFileName().toString(), detector.getLibraryDir().toAbsolutePath().toString());
+            Bootstrap.bootstrap(detector.getJvmArgs(forgeGroup, forgeFullVersion), detector.getMinecraftJar(mcVersion).getFileName().toString(), detector.getLibraryDir().toAbsolutePath().toString());
         } catch (Throwable ignored) {
             // Avoid this bunch of hacks that nuke the whole wrapper.
         }
-        if (!detector.checkExtraFiles(forgeFullVersion)) {
+        if (!detector.checkExtraFiles(forgeGroup, forgeFullVersion)) {
             System.out.println("Some extra libraries are missing! Running the installer to generate them now.");
 
             // Check installer jar.
-            Path installerJar = detector.getInstallerJar(forgeFullVersion);
+            Path installerJar = detector.getInstallerJar(forgeGroup, forgeFullVersion);
             if (!IFileDetector.isFile(installerJar)) {
                 throw new RuntimeException("Unable to detect the forge installer!");
             }
@@ -53,7 +54,7 @@ public class Main {
             }
         }
 
-        Class<?> mainClass = ModuleUtil.setupBootstrapLauncher(Class.forName(detector.getMainClass(forgeFullVersion)));
+        Class<?> mainClass = ModuleUtil.setupBootstrapLauncher(Class.forName(detector.getMainClass(forgeGroup, forgeFullVersion)));
         mainClass.getMethod("main", String[].class).invoke(null, new Object[] { args });
     }
 }

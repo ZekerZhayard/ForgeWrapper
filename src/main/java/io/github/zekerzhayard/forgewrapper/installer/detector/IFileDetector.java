@@ -64,7 +64,7 @@ public interface IFileDetector {
      * @param forgeFullVersion Forge full version (e.g. 1.14.4-28.2.0).
      * @return The forge installer jar path. It can also be defined by JVM argument "-Dforgewrapper.installer=&lt;installer-path&gt;".
      */
-    default Path getInstallerJar(String forgeFullVersion) {
+    default Path getInstallerJar(String forgeGroup, String forgeFullVersion) {
         String installer = System.getProperty("forgewrapper.installer");
         if (installer != null) {
             return Paths.get(installer).toAbsolutePath();
@@ -88,8 +88,8 @@ public interface IFileDetector {
      * @param forgeFullVersion Forge full version (e.g. 1.14.4-28.2.0).
      * @return The list of jvm args.
      */
-    default List<String> getJvmArgs(String forgeFullVersion) {
-        return this.getDataFromInstaller(forgeFullVersion, "version.json", e -> {
+    default List<String> getJvmArgs(String forgeGroup, String forgeFullVersion) {
+        return this.getDataFromInstaller(forgeGroup, forgeFullVersion, "version.json", e -> {
             JsonElement element = getElement(e.getAsJsonObject().getAsJsonObject("arguments"), "jvm");
             List<String> args = new ArrayList<>();
             if (!element.equals(JsonNull.INSTANCE)) {
@@ -103,21 +103,21 @@ public interface IFileDetector {
      * @param forgeFullVersion Forge full version (e.g. 1.14.4-28.2.0).
      * @return The main class.
      */
-    default String getMainClass(String forgeFullVersion) {
-        return this.getDataFromInstaller(forgeFullVersion, "version.json", e -> e.getAsJsonObject().getAsJsonPrimitive("mainClass").getAsString());
+    default String getMainClass(String forgeGroup, String forgeFullVersion) {
+        return this.getDataFromInstaller(forgeGroup, forgeFullVersion, "version.json", e -> e.getAsJsonObject().getAsJsonPrimitive("mainClass").getAsString());
     }
 
     /**
      * @param forgeFullVersion Forge full version (e.g. 1.14.4-28.2.0).
      * @return The json object in the-installer-jar-->install_profile.json-->data-->xxx-->client.
      */
-    default JsonObject getInstallProfileExtraData(String forgeFullVersion) {
-        return this.getDataFromInstaller(forgeFullVersion, "install_profile.json", e -> e.getAsJsonObject().getAsJsonObject("data"));
+    default JsonObject getInstallProfileExtraData(String forgeGroup, String forgeFullVersion) {
+        return this.getDataFromInstaller(forgeGroup, forgeFullVersion, "install_profile.json", e -> e.getAsJsonObject().getAsJsonObject("data"));
     }
 
     @SuppressWarnings("deprecation")
-    default <R> R getDataFromInstaller(String forgeFullVersion, String entry, Function<JsonElement, R> function) {
-        Path installer = this.getInstallerJar(forgeFullVersion);
+    default <R> R getDataFromInstaller(String forgeGroup, String forgeFullVersion, String entry, Function<JsonElement, R> function) {
+        Path installer = this.getInstallerJar(forgeGroup, forgeFullVersion);
         if (isFile(installer)) {
             try (ZipFile zf = new ZipFile(installer.toFile())) {
                 ZipEntry ze = zf.getEntry(entry);
@@ -143,8 +143,8 @@ public interface IFileDetector {
      * @param forgeFullVersion Forge full version (e.g. 1.14.4-28.2.0).
      * @return True represents all files are ready.
      */
-    default boolean checkExtraFiles(String forgeFullVersion) {
-        JsonObject jo = this.getInstallProfileExtraData(forgeFullVersion);
+    default boolean checkExtraFiles(String forgeGroup, String forgeFullVersion) {
+        JsonObject jo = this.getInstallProfileExtraData(forgeGroup, forgeFullVersion);
         if (jo != null) {
             Map<String, Path> libsMap = new HashMap<>();
             Map<String, String> hashMap = new HashMap<>();
