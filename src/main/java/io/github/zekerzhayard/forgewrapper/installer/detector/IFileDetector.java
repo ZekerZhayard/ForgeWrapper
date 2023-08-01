@@ -61,6 +61,7 @@ public interface IFileDetector {
     }
 
     /**
+     * @param forgeGroup Forge package group (e.g. net.minecraftforge).
      * @param forgeFullVersion Forge full version (e.g. 1.14.4-28.2.0).
      * @return The forge installer jar path. It can also be defined by JVM argument "-Dforgewrapper.installer=&lt;installer-path&gt;".
      */
@@ -85,6 +86,7 @@ public interface IFileDetector {
     }
 
     /**
+     * @param forgeGroup Forge package group (e.g. net.minecraftforge).
      * @param forgeFullVersion Forge full version (e.g. 1.14.4-28.2.0).
      * @return The list of jvm args.
      */
@@ -100,6 +102,7 @@ public interface IFileDetector {
     }
 
     /**
+     * @param forgeGroup Forge package group (e.g. net.minecraftforge).
      * @param forgeFullVersion Forge full version (e.g. 1.14.4-28.2.0).
      * @return The main class.
      */
@@ -108,6 +111,7 @@ public interface IFileDetector {
     }
 
     /**
+     * @param forgeGroup Forge package group (e.g. net.minecraftforge).
      * @param forgeFullVersion Forge full version (e.g. 1.14.4-28.2.0).
      * @return The json object in the-installer-jar-->install_profile.json-->data-->xxx-->client.
      */
@@ -140,6 +144,7 @@ public interface IFileDetector {
 
     /**
      * Check all cached files.
+     * @param forgeGroup Forge package group (e.g. net.minecraftforge).
      * @param forgeFullVersion Forge full version (e.g. 1.14.4-28.2.0).
      * @return True represents all files are ready.
      */
