@@ -28,7 +28,7 @@ public class Converter {
         JsonObject installProfile = getJsonFromZip(installerPath, "install_profile.json");
         List<String> arguments = getAdditionalArgs(installer);
         String mcVersion = arguments.get(arguments.indexOf("--fml.mcVersion") + 1);
-        String forgeGroup = arguments.get(arguments.indexOf("--fml.forgeGroup") + 1);
+        String forgeGroup = arguments.contains("--fml.forgeGroup") ? arguments.get(arguments.indexOf("--fml.forgeGroup") + 1) : "net.neoforged";
         String forgeVersion = arguments.get(arguments.indexOf("--fml.forgeVersion") + 1);
         String forgeFullVersion = "forge-" + mcVersion + "-" + forgeVersion;
         StringBuilder wrapperVersion = new StringBuilder();

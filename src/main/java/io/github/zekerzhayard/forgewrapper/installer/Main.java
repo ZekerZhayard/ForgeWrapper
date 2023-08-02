@@ -17,7 +17,7 @@ public class Main {
     public static void main(String[] args) throws Throwable {
         List<String> argsList = Stream.of(args).collect(Collectors.toList());
         String mcVersion = argsList.get(argsList.indexOf("--fml.mcVersion") + 1);
-        String forgeGroup = argsList.get(argsList.indexOf("--fml.forgeGroup") + 1);
+        String forgeGroup = argsList.contains("--fml.forgeGroup") ? argsList.get(argsList.indexOf("--fml.forgeGroup") + 1) : "net.neoforged";
         String forgeVersion = argsList.get(argsList.indexOf("--fml.forgeVersion") + 1);
         String forgeFullVersion = mcVersion + "-" + forgeVersion;
 
