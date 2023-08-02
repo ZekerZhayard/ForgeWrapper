@@ -10,12 +10,12 @@
     }
   ],
   "type": "release",
-  "uid": "net.minecraftforge",
+  "uid": "{FORGE_GROUP}",
   "version": "{FORGE_VERSION}",
   "mavenFiles": [
     {
-      "name": "net.minecraftforge:forge:{VERSION}-{FORGE_VERSION}:installer",
-      "url": "https://maven.minecraftforge.net/"
+      "name": "{FORGE_GROUP}:forge:{VERSION}-{FORGE_VERSION}:installer",
+      "url": "{MAVEN_URL}"
     }
   ],
   "libraries": [

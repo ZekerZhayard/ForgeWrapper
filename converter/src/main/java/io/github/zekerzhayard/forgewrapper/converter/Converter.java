@@ -28,12 +28,13 @@ public class Converter {
         JsonObject installProfile = getJsonFromZip(installerPath, "install_profile.json");
         List<String> arguments = getAdditionalArgs(installer);
         String mcVersion = arguments.get(arguments.indexOf("--fml.mcVersion") + 1);
+        String forgeGroup = arguments.get(arguments.indexOf("--fml.forgeGroup") + 1);
         String forgeVersion = arguments.get(arguments.indexOf("--fml.forgeVersion") + 1);
         String forgeFullVersion = "forge-" + mcVersion + "-" + forgeVersion;
         StringBuilder wrapperVersion = new StringBuilder();
 
-        JsonObject pack = convertPackJson(mcVersion);
-        JsonObject patches = convertPatchesJson(installer, installProfile, mcVersion, forgeVersion, wrapperVersion);
+        JsonObject pack = convertPackJson(mcVersion, forgeGroup);
+        JsonObject patches = convertPatchesJson(installer, installProfile, mcVersion, forgeGroup, forgeVersion, wrapperVersion);
 
         Files.createDirectories(targetDir);
 
@@ -48,14 +49,17 @@ public class Converter {
         Files.createDirectories(librariesPath);
         Files.copy(Paths.get(Converter.class.getProtectionDomain().getCodeSource().getLocation().toURI()), librariesPath.resolve(wrapperVersion.toString()), StandardCopyOption.REPLACE_EXISTING);
 
-        // Copy net.minecraftforge.json to <instance>/patches folder.
+        // Copy <forgeGroup>.json to <instance>/patches folder.
         Path patchesPath = instancePath.resolve("patches");
         Files.createDirectories(patchesPath);
-        Files.copy(new ByteArrayInputStream(patches.toString().getBytes(StandardCharsets.UTF_8)), patchesPath.resolve("net.minecraftforge.json"), StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(new ByteArrayInputStream(patches.toString().getBytes(StandardCharsets.UTF_8)), patchesPath.resolve(forgeGroup + ".json"), StandardCopyOption.REPLACE_EXISTING);
 
-        // Copy forge installer to MultiMC/libraries/net/minecraftforge/forge/<mcVersion>-<forgeVersion> folder.
+        // Copy forge installer to MultiMC/libraries/<forgeGroup>/forge/<mcVersion>-<forgeVersion> folder.
         if (multimcDir != null) {
-            Path targetInstallerPath = multimcDir.resolve("libraries").resolve("net").resolve("minecraftforge").resolve("forge").resolve(forgeVersion);
+            Path targetInstallerPath = multimcDir.resolve("libraries");
+            for (String dir : forgeGroup.split("\\."))
+                targetInstallerPath = targetInstallerPath.resolve(dir);
+            targetInstallerPath = targetInstallerPath.resolve("forge").resolve(mcVersion + "-" + forgeVersion);
             Files.createDirectories(targetInstallerPath);
             Files.copy(installerPath, targetInstallerPath.resolve(forgeFullVersion + "-installer.jar"), StandardCopyOption.REPLACE_EXISTING);
         }
@@ -83,7 +87,8 @@ public class Converter {
 
     // Convert mmc-pack.json:
     //   - Replace Minecraft version
-    private static JsonObject convertPackJson(String mcVersion) {
+    //   - Replace Forge package group
+    private static JsonObject convertPackJson(String mcVersion, String forgeGroup) {
         JsonObject pack = JsonParser.parseReader(new InputStreamReader(Converter.class.getResourceAsStream("/mmc-pack.json"))).getAsJsonObject();
 
         for (JsonElement component : getElement(pack, "components").getAsJsonArray()) {
@@ -91,26 +96,37 @@ public class Converter {
             JsonElement version = getElement(componentObject, "version");
             if (!version.isJsonNull() && getElement(componentObject, "uid").getAsString().equals("net.minecraft")) {
                 componentObject.addProperty("version", mcVersion);
+            } else if (getElement(componentObject, "uid").getAsString().equals("{FORGE_GROUP}")) {
+                componentObject.addProperty("uid", forgeGroup);
             }
         }
         return pack;
     }
 
-    // Convert patches/net.minecraftforge.json:
+    // Convert patches/<forgeGroup>.json:
     //   - Add libraries
     //   - Add forge-launcher url
     //   - Replace Minecraft & Forge versions
-    private static JsonObject convertPatchesJson(JsonObject installer, JsonObject installProfile, String mcVersion, String forgeVersion, StringBuilder wrapperVersion) {
-        JsonObject patches = JsonParser.parseReader(new InputStreamReader(Converter.class.getResourceAsStream("/patches/net.minecraftforge.json"))).getAsJsonObject();
+    //   - Replace Forge package group
+    private static JsonObject convertPatchesJson(JsonObject installer, JsonObject installProfile, String mcVersion, String forgeGroup, String forgeVersion, StringBuilder wrapperVersion) {
+        JsonObject patches = JsonParser.parseReader(new InputStreamReader(Converter.class.getResourceAsStream("/patches/template.json"))).getAsJsonObject();
         JsonArray mavenFiles = getElement(patches, "mavenFiles").getAsJsonArray();
         JsonArray libraries = getElement(patches, "libraries").getAsJsonArray();
 
         String minecraftArguments = String.join(" ", getElement(patches, "minecraftArguments").getAsString(), "--username ${auth_player_name} --version ${version_name} --gameDir ${game_directory} --assetsDir ${assets_root} --assetIndex ${assets_index_name} --uuid ${auth_uuid} --accessToken ${auth_access_token} --userType ${user_type} --versionType ${version_type}", String.join(" ", getAdditionalArgs(installer))).trim();
         patches.addProperty("minecraftArguments", minecraftArguments);
 
+        String[] forgeGroupParts = forgeGroup.split("\\.");
+        String[] forgeURLParts = new String[forgeGroupParts.length];
+        for (int i = 0; i < forgeURLParts.length; i++)
+            forgeURLParts[i] = forgeGroupParts[forgeGroupParts.length - i - 1];
+        String mavenURL = "https://maven." + String.join(".", forgeURLParts);
+
         for (JsonElement mavenFile : mavenFiles) {
-            String name = getElement(mavenFile.getAsJsonObject(), "name").getAsString();
-            mavenFile.getAsJsonObject().addProperty("name", name.replace("{VERSION}", mcVersion).replace("{FORGE_VERSION}", forgeVersion));
+            JsonObject mavenJsonObj = mavenFile.getAsJsonObject();
+            String name = getElement(mavenJsonObj, "name").getAsString();
+            mavenJsonObj.addProperty("name", name.replace("{FORGE_GROUP}", forgeGroup).replace("{VERSION}", mcVersion).replace("{FORGE_VERSION}", forgeVersion));
+            mavenJsonObj.addProperty("url", mavenURL);
         }
         for (JsonElement lib : libraries) {
             String name = getElement(lib.getAsJsonObject(), "name").getAsString();
@@ -119,13 +135,14 @@ public class Converter {
             }
         }
         Map<String, String> additionalUrls = new HashMap<>();
-        String path = String.format("net/minecraftforge/forge/%s-%s/forge-%s-%s", mcVersion, forgeVersion, mcVersion, forgeVersion);
-        additionalUrls.put(path + "-universal.jar", "https://maven.minecraftforge.net/" + path + "-universal.jar");
+        String path = String.format("%s/forge/%s-%s/forge-%s-%s", String.join("/", forgeGroupParts), mcVersion, forgeVersion, mcVersion, forgeVersion);
+        additionalUrls.put(path + "-universal.jar", mavenURL + "/" + path + "-universal.jar");
         transformLibraries(getElement(installProfile, "libraries").getAsJsonArray(), mavenFiles, additionalUrls);
         additionalUrls.clear();
-        additionalUrls.put(path + ".jar", "https://maven.minecraftforge.net/" + path + "-launcher.jar");
+        additionalUrls.put(path + ".jar", mavenURL + "/" + path + "-launcher.jar");
         transformLibraries(getElement(installer, "libraries").getAsJsonArray(), libraries, additionalUrls);
 
+        patches.addProperty("uid", forgeGroup);
         patches.addProperty("version", forgeVersion);
         for (JsonElement require : getElement(patches, "requires").getAsJsonArray()) {
             JsonObject requireObject = require.getAsJsonObject();
