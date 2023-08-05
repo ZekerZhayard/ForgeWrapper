@@ -3,7 +3,7 @@
   "component": {
     "group": "io.github.zekerzhayard",
     "module": "ForgeWrapper",
-    "version": "mmc2",
+    "version": "mmc3",
     "attributes": {
       "org.gradle.status": "release"
     }
@@ -25,13 +25,13 @@
       },
       "files": [
         {
-          "name": "ForgeWrapper-mmc2.jar",
-          "url": "ForgeWrapper-mmc2.jar",
-          "size": 34436,
-          "sha512": "e5773f108ca7705ec08fe4af1e750d43645e203bcedd2311571ed3395b25f7a3a9facb000ea533ef1e91eb3225f2b5b1ec0b671d1b2178afaed69ede1076150d",
-          "sha256": "f11a84de31b0201d0486640db5458491393d5293eeee77939dab9d282d2cdf53",
-          "sha1": "d28a8f57c89d2f0ec50cc21373756c3724a3de17",
-          "md5": "0004a244af040495b340dbf2ef7956f7"
+          "name": "ForgeWrapper-mmc3.jar",
+          "url": "ForgeWrapper-mmc3.jar",
+          "size": 34472,
+          "sha512": "08a64e02a625c14e554f3945128e7a4a67400b0c0212a33c058e7846d579c7c6e23d5033fa2c16988466f9b26bac9d92816476686e6709c37357e7194a695486",
+          "sha256": "b2770e7c10b2b58640fb91f941557a3e7e4dd3760b97bd8f03c2ddc0cbd263f4",
+          "sha1": "0bd8b4e13fc77d506157976c6846b867392e5113",
+          "md5": "a7f75000c7911b7fb27debdf54d28601"
         }
       ]
     },
@@ -69,13 +69,13 @@
       ],
       "files": [
         {
-          "name": "ForgeWrapper-mmc2.jar",
-          "url": "ForgeWrapper-mmc2.jar",
-          "size": 34436,
-          "sha512": "e5773f108ca7705ec08fe4af1e750d43645e203bcedd2311571ed3395b25f7a3a9facb000ea533ef1e91eb3225f2b5b1ec0b671d1b2178afaed69ede1076150d",
-          "sha256": "f11a84de31b0201d0486640db5458491393d5293eeee77939dab9d282d2cdf53",
-          "sha1": "d28a8f57c89d2f0ec50cc21373756c3724a3de17",
-          "md5": "0004a244af040495b340dbf2ef7956f7"
+          "name": "ForgeWrapper-mmc3.jar",
+          "url": "ForgeWrapper-mmc3.jar",
+          "size": 34472,
+          "sha512": "08a64e02a625c14e554f3945128e7a4a67400b0c0212a33c058e7846d579c7c6e23d5033fa2c16988466f9b26bac9d92816476686e6709c37357e7194a695486",
+          "sha256": "b2770e7c10b2b58640fb91f941557a3e7e4dd3760b97bd8f03c2ddc0cbd263f4",
+          "sha1": "0bd8b4e13fc77d506157976c6846b867392e5113",
+          "md5": "a7f75000c7911b7fb27debdf54d28601"
         }
       ]
     },
@@ -89,13 +89,13 @@
       },
       "files": [
         {
-          "name": "ForgeWrapper-mmc2-sources.jar",
-          "url": "ForgeWrapper-mmc2-sources.jar",
-          "size": 10369,
-          "sha512": "404a0df2293197badc578c0016f3fbd94ef47548a1c50f0596ba0f967cddaba49b27cd96dfbfeb10144c333264ee1968ad55c338e1d17d86a4013c8462173a1c",
-          "sha256": "a7e3cf1ed608cdcca3aee9ed7a69b7cdb667a1bc574c462d0dfe755a00598264",
-          "sha1": "3bf03ab889c64a424365eac754253310f41eed9b",
-          "md5": "6a28cb6b0101e9c2d5b69ac3cc52008a"
+          "name": "ForgeWrapper-mmc3-sources.jar",
+          "url": "ForgeWrapper-mmc3-sources.jar",
+          "size": 10418,
+          "sha512": "5851dd05498bd42a4cfb21cdd76a870dc0e593f12f75a0b4cc067096557df64f702caaf84b637e00f2cdd27489f7505bd40939ea1b33eec23927385b98dd809f",
+          "sha256": "2edfd171c53b8277c1c170762543c5907937cc6b85356ca7cf598b790428f153",
+          "sha1": "bed34924add768da35eceee0ec32fdeca2542331",
+          "md5": "551fd123aeba3d15cbce9d7b52bca469"
         }
       ]
     }
