@@ -7,7 +7,7 @@
       "version": "{VERSION}"
     },
     {
-      "uid": "net.minecraftforge"
+      "uid": "{FORGE_GROUP}"
     }
   ]
 }
