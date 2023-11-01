@@ -27,14 +27,14 @@ public class MultiMCFileDetector implements IFileDetector {
     }
 
     @Override
-    public Path getInstallerJar(String forgeGroup, String forgeFullVersion) {
-        Path path = IFileDetector.super.getInstallerJar(forgeGroup, forgeFullVersion);
+    public Path getInstallerJar(String forgeGroup, String forgeArtifact, String forgeFullVersion) {
+        Path path = IFileDetector.super.getInstallerJar(forgeGroup, forgeArtifact, forgeFullVersion);
         if (path == null) {
             if (this.installerJar == null) {
                 Path installerBase = this.getLibraryDir();
                 for (String dir : forgeGroup.split("\\."))
                     installerBase = installerBase.resolve(dir);
-                this.installerJar = installerBase.resolve("forge").resolve(forgeFullVersion).resolve("forge-" + forgeFullVersion + "-installer.jar").toAbsolutePath();
+                this.installerJar = installerBase.resolve(forgeArtifact).resolve(forgeFullVersion).resolve(forgeArtifact + "-" + forgeFullVersion + "-installer.jar").toAbsolutePath();
             }
             return this.installerJar;
         }
