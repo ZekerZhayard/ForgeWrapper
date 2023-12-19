@@ -9,6 +9,7 @@ import java.lang.module.ModuleFinder;
 import java.lang.module.ModuleReference;
 import java.lang.module.ResolvedModule;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -156,6 +157,15 @@ public class ModuleUtil {
             this.module = module;
             this.packages = packages;
             this.target = target;
+        }
+    }
+
+    public static void setupClassPath(Path libraryDir, List<String> paths) throws Throwable {
+        Class<?> urlClassPathClass = Class.forName("jdk.internal.loader.URLClassPath");
+        Object ucp = IMPL_LOOKUP.findGetter(Class.forName("jdk.internal.loader.BuiltinClassLoader"), "ucp", urlClassPathClass).invokeWithArguments(ClassLoader.getSystemClassLoader());
+        MethodHandle addURLMH = IMPL_LOOKUP.findVirtual(urlClassPathClass, "addURL", MethodType.methodType(void.class, URL.class));
+        for (String path : paths) {
+            addURLMH.invokeWithArguments(ucp, libraryDir.resolve(path).toUri().toURL());
         }
     }
 

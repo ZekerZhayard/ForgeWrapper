@@ -94,12 +94,25 @@ public interface IFileDetector {
      */
     default List<String> getJvmArgs(String forgeGroup, String forgeArtifact, String forgeFullVersion) {
         return this.getDataFromInstaller(forgeGroup, forgeArtifact, forgeFullVersion, "version.json", e -> {
-            JsonElement element = getElement(e.getAsJsonObject().getAsJsonObject("arguments"), "jvm");
+            JsonElement element = e.getAsJsonObject().get("arguments").getAsJsonObject().get("jvm");
             List<String> args = new ArrayList<>();
             if (!element.equals(JsonNull.INSTANCE)) {
                 element.getAsJsonArray().iterator().forEachRemaining(je -> args.add(je.getAsString()));
             }
             return args;
+        });
+    }
+
+    default List<String> getExtraLibraries(String forgeGroup, String forgeArtifact, String forgeFullVersion) {
+        return this.getDataFromInstaller(forgeGroup, forgeArtifact, forgeFullVersion, "version.json", e -> {
+            List<String> paths = new ArrayList<>();
+            e.getAsJsonObject().getAsJsonArray("libraries").iterator().forEachRemaining(je -> {
+                JsonObject artifact = je.getAsJsonObject().get("downloads").getAsJsonObject().get("artifact").getAsJsonObject();
+                if (artifact.get("url").getAsString().isEmpty()) {
+                    paths.add(artifact.get("path").getAsString());
+                }
+            });
+            return paths;
         });
     }
 
@@ -162,7 +175,7 @@ public interface IFileDetector {
             // Get all "data/<name>/client" elements.
             Pattern artifactPattern = Pattern.compile("^\\[(?<groupId>[^:]*):(?<artifactId>[^:]*):(?<version>[^:@]*)(:(?<classifier>[^@]*))?(@(?<type>[^]]*))?]$");
             for (Map.Entry<String, JsonElement> entry : jo.entrySet()) {
-                String clientStr = getElement(entry.getValue().getAsJsonObject(), "client").getAsString();
+                String clientStr = entry.getValue().getAsJsonObject().get("client").getAsString();
                 if (entry.getKey().endsWith("_SHA")) {
                     Pattern p = Pattern.compile("^'(?<sha1>[A-Za-z0-9]{40})'$");
                     Matcher m = p.matcher(clientStr);
@@ -181,7 +194,7 @@ public interface IFileDetector {
                             .resolve(groupId.replace('.', File.separatorChar))
                             .resolve(artifactId)
                             .resolve(version)
-                            .resolve(artifactId + "-" + version + (classifier.equals("") ? "" : "-") + classifier + "." + type).toAbsolutePath());
+                            .resolve(artifactId + "-" + version + (classifier.isEmpty() ? "" : "-") + classifier + "." + type).toAbsolutePath());
                     }
                 }
             }
@@ -208,19 +221,11 @@ public interface IFileDetector {
      * @return True represents the file is ready.
      */
     static boolean checkExtraFile(Path path, String sha1) {
-        return sha1 == null || sha1.equals("") || (isFile(path) && sha1.toLowerCase(Locale.ENGLISH).equals(getFileSHA1(path)));
+        return sha1 == null || sha1.isEmpty() || (isFile(path) && sha1.toLowerCase(Locale.ENGLISH).equals(getFileSHA1(path)));
     }
 
     static boolean isFile(Path path) {
         return path != null && Files.isRegularFile(path);
-    }
-
-    static JsonElement getElement(JsonObject object, String property) {
-        Optional<Map.Entry<String, JsonElement>> first = object.entrySet().stream().filter(e -> e.getKey().equals(property)).findFirst();
-        if (first.isPresent()) {
-            return first.get().getValue();
-        }
-        return JsonNull.INSTANCE;
     }
 
     static String getFileSHA1(Path path) {

@@ -15,6 +15,15 @@ public class Bootstrap {
         }
         jvmArgs = replacedJvmArgs;
 
+        // Remove NewLaunch.jar from property to prevent Forge from adding it to the module path
+        StringBuilder newCP = new StringBuilder();
+        for (String path : System.getProperty("java.class.path").split(File.pathSeparator)) {
+            if (!path.endsWith("NewLaunch.jar")) {
+                newCP.append(path).append(File.pathSeparator);
+            }
+        }
+        System.setProperty("java.class.path", newCP.substring(0, newCP.length() - 1));
+
         String modulePath = null;
         List<String> addExports = new ArrayList<>();
         List<String> addOpens = new ArrayList<>();
