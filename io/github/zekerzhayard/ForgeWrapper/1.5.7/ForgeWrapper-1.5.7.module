@@ -3,7 +3,7 @@
   "component": {
     "group": "io.github.zekerzhayard",
     "module": "ForgeWrapper",
-    "version": "1.5.8",
+    "version": "1.5.7",
     "attributes": {
       "org.gradle.status": "release"
     }
@@ -25,13 +25,13 @@
       },
       "files": [
         {
-          "name": "ForgeWrapper-1.5.8.jar",
-          "url": "ForgeWrapper-1.5.8.jar",
-          "size": 36085,
-          "sha512": "65617a507dabc248537c73365c4d731b6b1321c10cecacb064e0fb5f3ba2a18ea819084c2cc91b19b1204efdfb25a5b244f76d95b019091a4816d6a07ca1a05d",
-          "sha256": "a2003b9125a2171632c1e223aebd7291cbca5810611234f5d93e786a5c938c81",
-          "sha1": "b9fa1c59a6f2d665524ef366f9b3ec797cb596e6",
-          "md5": "d90699c9c37438e1a64e2fc625bacb8a"
+          "name": "ForgeWrapper-1.5.7.jar",
+          "url": "ForgeWrapper-1.5.7.jar",
+          "size": 34910,
+          "sha512": "5ac801b05d8ee30518885d89e3cf4ffd8e3024ffaf1904bc42ddd4485a2b1ddda4d8eec55cf0341a2c8b4d62d81019c58e415b8bc820e8773e2098debd485dc9",
+          "sha256": "2e4b7af5df7c8c8d36737fceed505fe08654db73d7ca24c1341f499dbe2693ae",
+          "sha1": "155ac9f4e5f65288eaacae19025ac4d9da1f0ef2",
+          "md5": "3f5a665e47e81102b6aba68ddb04c917"
         }
       ]
     },
@@ -69,13 +69,13 @@
       ],
       "files": [
         {
-          "name": "ForgeWrapper-1.5.8.jar",
-          "url": "ForgeWrapper-1.5.8.jar",
-          "size": 36085,
-          "sha512": "65617a507dabc248537c73365c4d731b6b1321c10cecacb064e0fb5f3ba2a18ea819084c2cc91b19b1204efdfb25a5b244f76d95b019091a4816d6a07ca1a05d",
-          "sha256": "a2003b9125a2171632c1e223aebd7291cbca5810611234f5d93e786a5c938c81",
-          "sha1": "b9fa1c59a6f2d665524ef366f9b3ec797cb596e6",
-          "md5": "d90699c9c37438e1a64e2fc625bacb8a"
+          "name": "ForgeWrapper-1.5.7.jar",
+          "url": "ForgeWrapper-1.5.7.jar",
+          "size": 34910,
+          "sha512": "5ac801b05d8ee30518885d89e3cf4ffd8e3024ffaf1904bc42ddd4485a2b1ddda4d8eec55cf0341a2c8b4d62d81019c58e415b8bc820e8773e2098debd485dc9",
+          "sha256": "2e4b7af5df7c8c8d36737fceed505fe08654db73d7ca24c1341f499dbe2693ae",
+          "sha1": "155ac9f4e5f65288eaacae19025ac4d9da1f0ef2",
+          "md5": "3f5a665e47e81102b6aba68ddb04c917"
         }
       ]
     },
@@ -89,13 +89,13 @@
       },
       "files": [
         {
-          "name": "ForgeWrapper-1.5.8-sources.jar",
-          "url": "ForgeWrapper-1.5.8-sources.jar",
-          "size": 10911,
-          "sha512": "599493c3f634fecd15575fac12e6f402a89ec46cf85ea58633933609b3f3a2d0b4ec81551c128e2c5fcae4d084c26405ce65d8c7798dbb2c78122599a0845527",
-          "sha256": "db29818a57636787540dc3c6ab1ab5364ce073df24cf241a70dc1a8f6c6ab566",
-          "sha1": "1f03d72e2c42563abb5a940492738d2984261d51",
-          "md5": "41227e5f533bc340ebf19a7ee89119f2"
+          "name": "ForgeWrapper-1.5.7-sources.jar",
+          "url": "ForgeWrapper-1.5.7-sources.jar",
+          "size": 10562,
+          "sha512": "a90df4495787bf0e3aaf0a9511e454d65cd3bb9b20f9cbd1db6ec6c4a04a0d79627b1189542b5f7b914e308f24c37905b27306f38419aa4ee8ebee3d4b8eef16",
+          "sha256": "e463cbafa2701f33c7cbe5bf75a32c78d470bc03e15e8fccf861842cdfce0a8a",
+          "sha1": "ba17f0f4330527a020d4868d950e18bfc3c6f2d2",
+          "md5": "91a6fc2f499ef6012ada3d97bb19834d"
         }
       ]
     }

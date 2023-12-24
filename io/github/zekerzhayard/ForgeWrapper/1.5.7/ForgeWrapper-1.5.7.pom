@@ -9,7 +9,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.zekerzhayard</groupId>
   <artifactId>ForgeWrapper</artifactId>
-  <version>1.5.8</version>
+  <version>1.5.7</version>
   <dependencies>
     <dependency>
       <groupId>ForgeWrapper</groupId>
