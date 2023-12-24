@@ -3,12 +3,13 @@
   <groupId>io.github.zekerzhayard</groupId>
   <artifactId>ForgeWrapper</artifactId>
   <versioning>
-    <latest>1.5.6</latest>
-    <release>1.5.6</release>
+    <latest>1.5.8</latest>
+    <release>1.5.8</release>
     <versions>
       <version>mmc1</version>
       <version>1.5.6</version>
+      <version>1.5.8</version>
     </versions>
-    <lastUpdated>20230805164351</lastUpdated>
+    <lastUpdated>20231224125510</lastUpdated>
   </versioning>
 </metadata>
