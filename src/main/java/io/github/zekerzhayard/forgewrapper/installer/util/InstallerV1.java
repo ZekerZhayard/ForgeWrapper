@@ -1,9 +1,9 @@
 package io.github.zekerzhayard.forgewrapper.installer.util;
 
 import java.io.File;
-import java.util.function.Predicate;
+import java.lang.reflect.Method;
 
-import net.minecraftforge.installer.actions.ClientInstall;
+import net.minecraftforge.installer.actions.PostProcessors;
 import net.minecraftforge.installer.actions.ProgressCallback;
 import net.minecraftforge.installer.json.Install;
 import net.minecraftforge.installer.json.InstallV1;
@@ -16,23 +16,22 @@ public class InstallerV1 extends AbstractInstaller {
     }
 
     @Override
-    public boolean runClientInstall(Install profile, ProgressCallback monitor, File libraryDir, File minecraftJar, File installerJar) {
-        return new ClientInstall4MultiMC(profile, monitor, libraryDir, minecraftJar).run(null, input -> true, installerJar);
-    }
+    public boolean runClientInstall(Install profile, ProgressCallback monitor, File libraryDir, File minecraftJar,
+            File installerJar) {
+        PostProcessors processors = new PostProcessors(
+                profile instanceof InstallV1 ? (InstallV1) profile : new InstallV1(profile), true, monitor);
 
-    public static class ClientInstall4MultiMC extends ClientInstall {
-        protected File libraryDir;
-        protected File minecraftJar;
+        try {
+            Method method = processors.getClass().getMethod("process", File.class, File.class, File.class, File.class);
+            Object result = method.invoke(processors, libraryDir, minecraftJar, libraryDir.getParentFile(),
+                    installerJar);
 
-        public ClientInstall4MultiMC(Install profile, ProgressCallback monitor, File libraryDir, File minecraftJar) {
-            super(profile instanceof InstallV1 ? (InstallV1) profile : new InstallV1(profile), monitor);
-            this.libraryDir = libraryDir;
-            this.minecraftJar = minecraftJar;
-        }
+            if (method.getReturnType() == boolean.class)
+                return (boolean) result;
 
-        @Override
-        public boolean run(File target, Predicate<String> optionals, File installer) {
-            return this.processors.process(this.libraryDir, this.minecraftJar, this.libraryDir.getParentFile(), installer);
+            return result != null;
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
         }
     }
 }
