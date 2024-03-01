@@ -12,6 +12,7 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,10 +20,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.github.zekerzhayard.forgewrapper.util.CheckedLambdaUtil;
 import sun.misc.Unsafe;
 
 public class ModuleUtil {
@@ -53,17 +52,27 @@ public class ModuleUtil {
         MethodHandle loadModuleMH = IMPL_LOOKUP.findVirtual(Class.forName("jdk.internal.loader.BuiltinClassLoader"), "loadModule", MethodType.methodType(void.class, ModuleReference.class));
 
         // Resolve modules to a new config and load all extra modules in system class loader (unnamed modules for now)
-        Configuration config = Configuration.resolveAndBind(finder, List.of(ModuleLayer.boot().configuration()), finder, finder.findAll().stream().filter(mref -> !ModuleLayer.boot().findModule(mref.descriptor().name()).isPresent()).peek(CheckedLambdaUtil.wrapConsumer(mref -> loadModuleMH.invokeWithArguments(ClassLoader.getSystemClassLoader(), mref))).map(mref -> mref.descriptor().name()).collect(Collectors.toList()));
+        List<String> roots = new ArrayList<>();
+        for (ModuleReference mref : finder.findAll()) {
+            String name = mref.descriptor().name();
+            if (!ModuleLayer.boot().findModule(name).isPresent()) {
+                loadModuleMH.invokeWithArguments(ClassLoader.getSystemClassLoader(), mref);
+                roots.add(name);
+            }
+        }
+        Configuration config = Configuration.resolveAndBind(finder, List.of(ModuleLayer.boot().configuration()), finder, roots);
 
         // Copy the new config graph to boot module layer config
         MethodHandle graphGetter = IMPL_LOOKUP.findGetter(Configuration.class, "graph", Map.class);
         HashMap<ResolvedModule, Set<ResolvedModule>> graphMap = new HashMap<>((Map<ResolvedModule, Set<ResolvedModule>>) graphGetter.invokeWithArguments(config));
         MethodHandle cfSetter = IMPL_LOOKUP.findSetter(ResolvedModule.class, "cf", Configuration.class);
         // Reset all extra resolved modules config to boot module layer config
-        graphMap.forEach(CheckedLambdaUtil.wrapBiConsumer((k, v) -> {
-            cfSetter.invokeWithArguments(k, ModuleLayer.boot().configuration());
-            v.forEach(CheckedLambdaUtil.wrapConsumer(m -> cfSetter.invokeWithArguments(m, ModuleLayer.boot().configuration())));
-        }));
+        for (Map.Entry<ResolvedModule, Set<ResolvedModule>> entry : graphMap.entrySet()) {
+            cfSetter.invokeWithArguments(entry.getKey(), ModuleLayer.boot().configuration());
+            for (ResolvedModule resolvedModule : entry.getValue()) {
+                cfSetter.invokeWithArguments(resolvedModule, ModuleLayer.boot().configuration());
+            }
+        }
         graphMap.putAll((Map<ResolvedModule, Set<ResolvedModule>>) graphGetter.invokeWithArguments(ModuleLayer.boot().configuration()));
         IMPL_LOOKUP.findSetter(Configuration.class, "graph", Map.class).invokeWithArguments(ModuleLayer.boot().configuration(), new HashMap<>(graphMap));
 
@@ -92,7 +101,17 @@ public class ModuleUtil {
 
         // Add reads from extra modules to jdk modules
         MethodHandle implAddReadsMH = IMPL_LOOKUP.findVirtual(Module.class, "implAddReads", MethodType.methodType(void.class, Module.class));
-        config.modules().forEach(rm -> ModuleLayer.boot().findModule(rm.name()).ifPresent(m -> oldBootModules.forEach(brm -> ModuleLayer.boot().findModule(brm.name()).ifPresent(CheckedLambdaUtil.wrapConsumer(bm -> implAddReadsMH.invokeWithArguments(m, bm))))));
+        for (ResolvedModule resolvedModule : config.modules()) {
+            Module module = ModuleLayer.boot().findModule(resolvedModule.name()).orElse(null);
+            if (module != null) {
+                for (ResolvedModule bootResolvedModule : oldBootModules) {
+                    Module bootModule = ModuleLayer.boot().findModule(bootResolvedModule.name()).orElse(null);
+                    if (bootModule != null) {
+                        implAddReadsMH.invokeWithArguments(module, bootModule);
+                    }
+                }
+            }
+        }
     }
 
     public static void addExports(List<String> exports) {
@@ -124,13 +143,26 @@ public class ModuleUtil {
         }
 
         void implAdd(List<String> extras) {
-            extras.stream().map(ModuleUtil::parseModuleExtra).filter(Optional::isPresent).map(Optional::get).forEach(CheckedLambdaUtil.wrapConsumer(data -> ModuleLayer.boot().findModule(data.module).ifPresent(CheckedLambdaUtil.wrapConsumer(m -> {
-                if ("ALL-UNNAMED".equals(data.target)) {
-                    this.implAddToAllUnnamedMH.invokeWithArguments(m, data.packages);
-                } else {
-                    ModuleLayer.boot().findModule(data.target).ifPresent(CheckedLambdaUtil.wrapConsumer(tm -> this.implAddMH.invokeWithArguments(m, data.packages, tm)));
+            for (String extra : extras) {
+                ParserData data = ModuleUtil.parseModuleExtra(extra).orElse(null);
+                if (data != null) {
+                    Module module = ModuleLayer.boot().findModule(data.module).orElse(null);
+                    if (module != null) {
+                        try {
+                            if ("ALL-UNNAMED".equals(data.target)) {
+                                this.implAddToAllUnnamedMH.invokeWithArguments(module, data.packages);
+                            } else {
+                                Module targetModule = ModuleLayer.boot().findModule(data.target).orElse(null);
+                                if (targetModule != null) {
+                                    this.implAddMH.invokeWithArguments(module, data.packages, targetModule);
+                                }
+                            }
+                        } catch (Throwable t) {
+                            throw new RuntimeException(t);
+                        }
+                    }
                 }
-            }))));
+            }
         }
     }
 

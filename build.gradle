@@ -15,9 +15,6 @@ group = "io.github.zekerzhayard"
 archivesBaseName = rootProject.name
 
 configurations {
-    provided {
-        implementation.extendsFrom provided
-    }
     multirelase {
         implementation.extendsFrom multirelase
     }
@@ -34,11 +31,9 @@ repositories {
 dependencies {
     compileOnly "com.google.code.gson:gson:2.8.7"
     compileOnly "cpw.mods:modlauncher:8.0.9"
-    compileOnly "net.minecraftforge:installer:2.1.9"
+    compileOnly "net.minecraftforge:installer:2.2.7"
     compileOnly "net.sf.jopt-simple:jopt-simple:5.0.4"
 
-    provided project(":common")
-    provided project(":legacy")
     multirelase project(":jigsaw")
 }
 
@@ -59,10 +54,6 @@ jar {
         "Multi-Release": "true",
         "GitCommit": String.valueOf(System.getenv("GITHUB_SHA"))
     ])
-
-    from configurations.provided.files.collect {
-        zipTree(it)
-    }
 
     into "META-INF/versions/9", {
         from configurations.multirelase.files.collect {

@@ -7,11 +7,12 @@ import java.util.List;
 import io.github.zekerzhayard.forgewrapper.installer.util.ModuleUtil;
 
 public class Bootstrap {
-    public static void bootstrap(List<String> jvmArgs, String minecraftJar, String libraryDir) throws Throwable {
+    public static void bootstrap(String[] jvmArgs, String minecraftJar, String libraryDir) throws Throwable {
         // Replace all placeholders
-        List<String> replacedJvmArgs = new ArrayList<>();
-        for (String arg : jvmArgs) {
-            replacedJvmArgs.add(arg.replace("${classpath}", System.getProperty("java.class.path").replace(File.separator, "/")).replace("${classpath_separator}", File.pathSeparator).replace("${library_directory}", libraryDir).replace("${version_name}", minecraftJar.substring(0, minecraftJar.lastIndexOf('.'))));
+        String[] replacedJvmArgs = new String[jvmArgs.length];
+        for (int i = 0; i < jvmArgs.length; i++) {
+            String arg = jvmArgs[i];
+            replacedJvmArgs[i] = arg.replace("${classpath}", System.getProperty("java.class.path").replace(File.separator, "/")).replace("${classpath_separator}", File.pathSeparator).replace("${library_directory}", libraryDir).replace("${version_name}", minecraftJar.substring(0, minecraftJar.lastIndexOf('.')));
         }
         jvmArgs = replacedJvmArgs;
 
@@ -27,23 +28,23 @@ public class Bootstrap {
         String modulePath = null;
         List<String> addExports = new ArrayList<>();
         List<String> addOpens = new ArrayList<>();
-        for (int i = 0; i < jvmArgs.size(); i++) {
-            String arg = jvmArgs.get(i);
+        for (int i = 0; i < jvmArgs.length; i++) {
+            String arg = jvmArgs[i];
 
             if (arg.equals("-p") || arg.equals("--module-path")) {
-                modulePath = jvmArgs.get(i + 1);
+                modulePath = jvmArgs[i + 1];
             } else if (arg.startsWith("--module-path=")) {
                 modulePath = arg.split("=", 2)[1];
             }
 
             if (arg.equals("--add-exports")) {
-                addExports.add(jvmArgs.get(i + 1));
+                addExports.add(jvmArgs[i + 1]);
             } else if (arg.startsWith("--add-exports=")) {
                 addExports.add(arg.split("=", 2)[1]);
             }
 
             if (arg.equals("--add-opens")) {
-                addOpens.add(jvmArgs.get(i + 1));
+                addOpens.add(jvmArgs[i + 1]);
             } else if (arg.startsWith("--add-opens=")) {
                 addOpens.add(arg.split("=", 2)[1]);
             }

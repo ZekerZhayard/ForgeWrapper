@@ -26,7 +26,3 @@ configurations {
         }
     }
 }
-
-dependencies {
-    compileOnly project(":common")
-}
