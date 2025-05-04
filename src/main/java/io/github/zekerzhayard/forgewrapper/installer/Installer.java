@@ -24,16 +24,16 @@ import net.minecraftforge.installer.json.Version;
 
 public class Installer {
     private static InstallV1Wrapper wrapper;
-    private static InstallV1Wrapper getWrapper(File librariesDir) {
+    private static InstallV1Wrapper getWrapper(File librariesDir, boolean skipHashCheck) {
         if (wrapper == null) {
-            wrapper = new InstallV1Wrapper(Util.loadInstallProfile(), librariesDir);
+            wrapper = new InstallV1Wrapper(Util.loadInstallProfile(), librariesDir, skipHashCheck);
         }
         return wrapper;
     }
 
-    public static Map<String, Object> getData(File librariesDir) {
+    public static Map<String, Object> getData(File librariesDir, boolean skipHashCheck) {
         Map<String, Object> data = new HashMap<>();
-        Version0 version = Version0.loadVersion(getWrapper(librariesDir));
+        Version0 version = Version0.loadVersion(getWrapper(librariesDir, skipHashCheck));
         data.put("mainClass", version.getMainClass());
         data.put("jvmArgs", version.getArguments().getJvm());
         data.put("extraLibraries", getExtraLibraries(version));
@@ -79,15 +79,20 @@ public class Installer {
     public static class InstallV1Wrapper extends InstallV1 {
         protected Map<String, List<Processor>> processors = new HashMap<>();
         protected File librariesDir;
+        protected boolean skipHashCheck = false;
 
-        public InstallV1Wrapper(InstallV1 v1, File librariesDir) {
+        public InstallV1Wrapper(InstallV1 v1, File librariesDir, boolean skipHashCheck) {
             super(v1);
             this.serverJarPath = v1.getServerJarPath();
             this.librariesDir = librariesDir;
+            this.skipHashCheck = skipHashCheck;
         }
 
         @Override
         public List<Processor> getProcessors(String side) {
+            if (this.skipHashCheck){
+                 return new ArrayList<>();
+            }
             List<Processor> processor = this.processors.get(side);
             if (processor == null) {
                 checkProcessorFiles(processor = super.getProcessors(side), super.getData("client".equals(side)), this.librariesDir);
