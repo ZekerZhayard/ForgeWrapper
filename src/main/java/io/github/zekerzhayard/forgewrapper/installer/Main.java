@@ -24,6 +24,7 @@ public class Main {
         // NOTE: this is only true for NeoForge versions past 20.2.x
         // early versions of NeoForge (for 1.20.1) are not supposed to be covered here
         boolean isNeoForge = argsList.contains("--fml.neoForgeVersion");
+        boolean skipHashCheck = argsList.contains("--skipHashCheck");
 
         String mcVersion = argsList.get(argsList.indexOf("--fml.mcVersion") + 1);
         String forgeGroup = argsList.contains("--fml.forgeGroup") ? argsList.get(argsList.indexOf("--fml.forgeGroup") + 1) : "net.neoforged";
@@ -52,7 +53,7 @@ public class Main {
         }, ModuleUtil.getPlatformClassLoader())) {
             Class<?> installer = ucl.loadClass("io.github.zekerzhayard.forgewrapper.installer.Installer");
 
-            Map<String, Object> data = (Map<String, Object>) installer.getMethod("getData", File.class).invoke(null, detector.getLibraryDir().toFile());
+            Map<String, Object> data = (Map<String, Object>) installer.getMethod("getData", File.class, boolean.class).invoke(null, detector.getLibraryDir().toFile(), skipHashCheck);
             try {
                 Bootstrap.bootstrap((String[]) data.get("jvmArgs"), detector.getMinecraftJar(mcVersion).getFileName().toString(), detector.getLibraryDir().toAbsolutePath().toString());
             } catch (Throwable t) {
